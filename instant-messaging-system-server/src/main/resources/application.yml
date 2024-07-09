@@ -1,0 +1,19 @@
+spring:
+  profiles:
+    active: test #test envrionment
+  application:
+    name: instant-messaging-system
+  datasource:
+    url: jdbc:mysql://${imsystem.mysql.ip}:${imsystem.mysql.port}/${imsystem.mysql.db}?useUnicode=true&characterEncoding=UTF-8
+    username: ${imsystem.mysql.username}
+    password: ${imsystem.mysql.password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: ${imsystem.redis.host} #redis service address
+    port: ${imsystem.redis.port} #redis port
+    database: 0
+    timeout: 1800000
+    password: ${imsystem.redis.password}
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
