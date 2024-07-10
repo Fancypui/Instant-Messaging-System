@@ -15,11 +15,14 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.NettyRuntime;
+import io.netty.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.logging.SocketHandler;
 
 @Slf4j
@@ -37,6 +40,15 @@ public class NettyWebSocketServer {
     @PostConstruct
     public void start() throws InterruptedException {
         run();
+    }
+
+    @PreDestroy
+    public void destroy(){
+        Future<?> future = bossGroup.shutdownGracefully();
+        Future<?> future1 = workerGroup.shutdownGracefully();
+        future.syncUninterruptibly();
+        future1.syncUninterruptibly();
+        log.info("Close websocket server successfully");
     }
 
     private void run() throws InterruptedException {
@@ -58,6 +70,7 @@ public class NettyWebSocketServer {
 
                          */
                         pipeline.addLast(new HttpServerCodec());
+                        pipeline.addLast(new IdleStateHandler(10,0,0));
                         pipeline.addLast(new ChunkedWriteHandler());
                         /*
                             1. When using http protocol to transmit data, it might transmit multiple segment,
