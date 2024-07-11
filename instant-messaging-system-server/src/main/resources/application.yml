@@ -17,3 +17,11 @@ spring:
   jackson:
     serialization:
       write-dates-as-timestamps: true
+wx:
+  mp:
+    callback: ${imsystem.wx.callback}
+    configs:
+      - appId: ${imsystem.wx.appId}
+        secret: ${imsystem.wx.secret}
+        token: ${imsystem.wx.token}
+        aesKey: ${imsystem.wx.aesKey}
