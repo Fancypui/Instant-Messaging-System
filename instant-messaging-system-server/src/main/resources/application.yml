@@ -14,6 +14,12 @@ spring:
     database: 0
     timeout: 1800000
     password: ${imsystem.redis.password}
+    lettuce:
+      pool:
+        max-wait: -1
+        max-idle: 5
+        min-idle: 0
+        max-active: 20
   jackson:
     serialization:
       write-dates-as-timestamps: true
@@ -25,3 +31,5 @@ wx:
         secret: ${imsystem.wx.secret}
         token: ${imsystem.wx.token}
         aesKey: ${imsystem.wx.aesKey}
+jwt:
+  secret: ${imsystem.jwt.token}

@@ -10,10 +10,12 @@ import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import me.chanjar.weixin.mp.config.impl.WxMpDefaultConfigImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,15 +23,22 @@ import java.util.stream.Collectors;
 import static me.chanjar.weixin.common.api.WxConsts.EventType.SUBSCRIBE;
 import static me.chanjar.weixin.common.api.WxConsts.XmlMsgType.EVENT;
 
-@AllArgsConstructor
+//@AllArgsConstructor
 @Configuration
 @EnableConfigurationProperties(WxMpProperties.class)
 public class WxMpConfiguration {
-    private final LogHandler logHandler;
-    private final MsgHandler msgHandler;
-    private final SubscribeHandler subscribeHandler;
-    private final ScanHandler scanHandler;
-    private final WxMpProperties wxMpProperties;
+    @Autowired
+    private LogHandler logHandler;
+    @Autowired
+    private  MsgHandler msgHandler;
+    @Autowired
+    @Lazy
+    private  SubscribeHandler subscribeHandler;
+    @Autowired
+    @Lazy
+    private  ScanHandler scanHandler;
+    @Autowired
+    private  WxMpProperties wxMpProperties;
 
     @Bean
     public WxMpService wxMpService(){

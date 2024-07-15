@@ -4,5 +4,23 @@ import org.springframework.stereotype.Service;
 
 
 public interface LoginService {
-    String login();
+    /**
+     * generate jwt token
+     * @return
+     */
+    String login(Long uid);
+
+    /**
+     * renew jwt token if needed
+     * @param token
+     */
+    void renewalTokenIfNecessary(String token);
+
+    /**
+     * Verify if token is valid
+     * @param token
+     * @return
+     */
+    Long getValidUid(String token);
+
 }

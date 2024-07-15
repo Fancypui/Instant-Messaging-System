@@ -3,6 +3,7 @@ package com.youmin.imsystem.common.user.controller;
 
 
 
+import com.youmin.imsystem.common.user.service.WxMsgService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
@@ -30,7 +31,7 @@ public class WxPortalController {
 
     private final WxMpService wxService;
     private final WxMpMessageRouter messageRouter;
-//    private final WxMsgService wxMsgService;
+    private final WxMsgService wxMsgService;
 
     @GetMapping("/test")
     public String getQrCode(@RequestParam Integer code) throws WxErrorException {

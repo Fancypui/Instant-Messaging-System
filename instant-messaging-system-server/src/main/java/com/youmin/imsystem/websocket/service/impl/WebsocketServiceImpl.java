@@ -96,7 +96,7 @@ public class WebsocketServiceImpl implements WebsocketService {
         //remove code
         WS_LOGIN_MAP.invalidate(code);
         //call login module to get token
-        String token = loginService.login();
+        String token = loginService.login(uid);
         WSRespBase<WSLoginSuccessResp> loginSuccessResp = WSAdapter.build(user, token);
         sendMsg(channel,loginSuccessResp);
     }
