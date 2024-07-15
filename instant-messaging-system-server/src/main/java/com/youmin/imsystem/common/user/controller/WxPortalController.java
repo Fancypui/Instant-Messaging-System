@@ -64,7 +64,7 @@ public class WxPortalController {
     public RedirectView callBack(@RequestParam String code) throws WxErrorException {
         WxOAuth2AccessToken accessToken = wxService.getOAuth2Service().getAccessToken(code);
         WxOAuth2UserInfo userInfo = wxService.getOAuth2Service().getUserInfo(accessToken, "zh_CN");
-        System.out.println(userInfo);
+        wxMsgService.authorized(userInfo);
         return null;
     }
 

@@ -42,6 +42,9 @@ public class NettyWebSocketServer {
         run();
     }
 
+    /**
+     * shutdown netty server gracefully
+     */
     @PreDestroy
     public void destroy(){
         Future<?> future = bossGroup.shutdownGracefully();
@@ -50,6 +53,7 @@ public class NettyWebSocketServer {
         future1.syncUninterruptibly();
         log.info("Close websocket server successfully");
     }
+
 
     private void run() throws InterruptedException {
         ServerBootstrap serverBootstrap = new ServerBootstrap();

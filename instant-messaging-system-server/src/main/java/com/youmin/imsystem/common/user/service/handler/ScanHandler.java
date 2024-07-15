@@ -17,18 +17,14 @@ import java.util.Map;
 @Component
 public class ScanHandler extends AbstractHandler{
 
-    @Value("${imsystem.wx.callback}")
-    private String callback;
-
-    private static final String URL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect";
-
+    @Autowired
+    @Lazy
+    private WxMsgService wxMsgService;
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMpXmlMessage, Map<String, Object> map,
                                     WxMpService wxMpService, WxSessionManager wxSessionManager) throws WxErrorException {
-        String authenticateUrl = String.format(URL, wxMpService.getWxMpConfigStorage().getAppId(), URLEncoder.encode(callback+"/wx/portal/public/callBack"));
-        System.out.println(authenticateUrl);
-        return TextBuilder.build("Please click the link to authenticate: " + "<a href=\"" + authenticateUrl +
-                        "\">Register Imsystem Account</a>", wxMpXmlMessage);
+        //scan qr event handling
+        return this.wxMsgService.scan(wxMpXmlMessage);
 
     }
 }
