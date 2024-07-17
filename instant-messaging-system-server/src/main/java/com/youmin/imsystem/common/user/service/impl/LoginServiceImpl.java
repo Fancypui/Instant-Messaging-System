@@ -6,6 +6,7 @@ import com.youmin.imsystem.common.common.utils.RedisUtils;
 import com.youmin.imsystem.common.user.service.LoginService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -17,16 +18,32 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     private JWTUtils jwtUtils;
 
+    //if token's expire day is less than 1, then renew
+    private static final int TOKEN_RENEWAL_TIME = 1;
+    private static final int TOKEN_VALID_DURATION = 3;
+
     @Override
     public String login(Long uid) {
         String token = jwtUtils.createToken(uid);
-        RedisUtils.set(getUserTokenKey(uid),token,3, TimeUnit.DAYS);
+        RedisUtils.set(getUserTokenKey(uid),token,TOKEN_VALID_DURATION, TimeUnit.DAYS);
         return token;
     }
 
     @Override
+    @Async
     public void renewalTokenIfNecessary(String token) {
-
+        Long uid = getValidUid(token);
+        if(uid==null){
+            return;
+        }
+        Long expireDays = RedisUtils.getExpire(getUserTokenKey(uid),TimeUnit.DAYS);
+        //Redis does not have this value
+        if(expireDays==-2){
+            return;
+        }
+        if(expireDays<=TOKEN_RENEWAL_TIME){
+            RedisUtils.expire(getUserTokenKey(uid),TOKEN_VALID_DURATION, TimeUnit.DAYS);
+        }
     }
 
     @Override
@@ -36,10 +53,10 @@ public class LoginServiceImpl implements LoginService {
             return null;
         }
         String oldToken = RedisUtils.get(getUserTokenKey(uid), String.class);
-        if(StringUtils.isBlank(oldToken)){
+        if(StringUtils.isBlank(oldToken) ){
             return null;
         }
-        return uid;
+        return Objects.equals(token,oldToken)?uid:null;
 
     }
 

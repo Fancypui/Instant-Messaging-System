@@ -1,4 +1,4 @@
-package com.youmin.imsystem.utils;
+package com.youmin.imsystem.common.common.utils;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;

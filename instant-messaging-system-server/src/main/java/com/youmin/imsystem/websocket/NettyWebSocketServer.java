@@ -10,7 +10,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.codec.http.websocketx.WebSocketClientProtocolHandler;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
@@ -23,7 +22,6 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.logging.SocketHandler;
 
 @Slf4j
 @Configuration
@@ -81,6 +79,7 @@ public class NettyWebSocketServer {
                                 HttpObjectAggregator is used to aggregate all the segmented data
                          */
                         pipeline.addLast(new HttpObjectAggregator(8192));
+                        pipeline.addLast(new HttpHeaderHandler());
                         /**
                          * 1. The core function of WebSocketServerProtocolHandler is to upgrade http protocol to websocket protocol
                          * 2. Browser can send request using ws://localhost(or up):8090/ to upgrade protocol

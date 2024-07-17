@@ -56,7 +56,7 @@ public class MybatisGenerator {
         strategyConfig.setEntityTableFieldAnnotationEnable(true);
 
         strategyConfig.setInclude(
-                "user"
+                "item_config","user_backpack"
         );
 
         List<TableFill> list = new ArrayList<TableFill>();

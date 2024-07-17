@@ -97,8 +97,7 @@ public class WebsocketServiceImpl implements WebsocketService {
         WS_LOGIN_MAP.invalidate(code);
         //call login module to get token
         String token = loginService.login(uid);
-        WSRespBase<WSLoginSuccessResp> loginSuccessResp = WSAdapter.build(user, token);
-        sendMsg(channel,loginSuccessResp);
+        loginSuccess(channel,user,token);
     }
 
     /**
@@ -135,5 +134,21 @@ public class WebsocketServiceImpl implements WebsocketService {
             code = RandomUtil.randomInt(Integer.MAX_VALUE);
         }while (Objects.nonNull(WS_LOGIN_MAP.asMap().put(code,channel)));
         return code;
+    }
+
+    public void loginSuccess(Channel channel, User user, String token){
+        WSRespBase<WSLoginSuccessResp> resp = WSAdapter.build(user, token);
+        sendMsg(channel,resp);
+
+    }
+
+    public void authorize(Channel channel,String token){
+        Long validUid = loginService.getValidUid(token);
+        if(Objects.nonNull(validUid)){//user authentication passed, let user login
+            User user = this.userDao.getById(validUid);
+            loginSuccess(channel,user,token);
+        }else{//let client-side token invalida
+            sendMsg(channel,WSAdapter.buildInvalidateResp());
+        }
     }
 }

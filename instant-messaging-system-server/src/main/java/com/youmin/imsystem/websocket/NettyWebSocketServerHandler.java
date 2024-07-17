@@ -1,5 +1,6 @@
 package com.youmin.imsystem.websocket;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.youmin.imsystem.websocket.domain.enums.WSReqTypeEnum;
@@ -21,18 +22,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
 
+
     private WebsocketServiceImpl websocketService;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("channel active go first");
         this.websocketService = SpringUtil.getBean(WebsocketServiceImpl.class);
         websocketService.connect(ctx.channel());
     }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        System.out.println("userevent go first");
         if(evt instanceof WebSocketServerProtocolHandler.HandshakeComplete){
-            System.out.println("Handshake Completed");
+            String token = NettyUtils.getAttribute(ctx.channel(), NettyUtils.TOKEN);
+            if(StrUtil.isNotBlank(token)) {
+                this.websocketService.authorize(ctx.channel(), token);
+            }
         }
         if(evt instanceof IdleStateEvent){
             IdleStateEvent idleStateEvent =  (IdleStateEvent)evt;
@@ -74,6 +81,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
                 log.info("Request for QR code = "+msg.text());
                 break;
             case AUTHORIZATION:
+
                 break;
             case HEARTBEAT:
                 break;

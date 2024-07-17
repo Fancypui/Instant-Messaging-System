@@ -1,4 +1,4 @@
-package com.youmin.imsystem.config;
+package com.youmin.imsystem.common.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -32,4 +32,10 @@ public class WSAdapter {
         wsRespBase.setType(WSRespTypeEnum.LOGIN_SCAN_SUCCESS.getType());
         return wsRespBase;
     }
+
+    public static WSRespBase<?> buildInvalidateResp(){
+        WSRespBase<WSLoginResp> wsRespBase = new WSRespBase<>();
+        wsRespBase.setType(WSRespTypeEnum.INVALIDATE_TOKEN.getType());
+        return wsRespBase;
+    }
 }

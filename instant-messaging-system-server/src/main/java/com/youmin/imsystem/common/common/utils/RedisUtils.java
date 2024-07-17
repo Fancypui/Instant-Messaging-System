@@ -2,7 +2,6 @@ package com.youmin.imsystem.common.common.utils;
 
 
 import cn.hutool.extra.spring.SpringUtil;
-import com.youmin.imsystem.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
