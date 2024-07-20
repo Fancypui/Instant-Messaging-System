@@ -2,6 +2,7 @@ package com.youmin.imsystem.common;
 
 
 import com.youmin.imsystem.common.user.domain.entity.User;
+import com.youmin.imsystem.common.user.service.LoginService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.redisson.api.RLock;
@@ -20,16 +21,17 @@ public class UserDao {
     @Autowired
     private com.youmin.imsystem.common.user.dao.UserDao userDao;
 
-
-
     @Autowired
-    private RedisTemplate redisTemplate;
+    private LoginService loginService;
+
+
     @Test
-    public void redis() {
-        redisTemplate.opsForValue().getAndDelete("name");
-        String name = (String) redisTemplate.opsForValue().get("name");
-        System.out.println(name);
+    public void setUserToken(){
+        String token = loginService.login(11000L);
     }
+
+
+
 
     @Test
     public void test(){

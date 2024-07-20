@@ -76,7 +76,7 @@ public class MybatisGenerator {
     public static void assembleDev(DataSourceConfig dataSourceConfig) {
         dataSourceConfig.setDriverName("com.mysql.cj.jdbc.Driver");
         dataSourceConfig.setUsername("root");
-        dataSourceConfig.setPassword("123456");
-        dataSourceConfig.setUrl("jdbc:mysql://127.0.0.1:3307/IMSystem?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC");
+        dataSourceConfig.setPassword("youmin");
+        dataSourceConfig.setUrl("jdbc:mysql://127.0.0.1:3306/IMSystem?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC");
     }
 }
