@@ -1,7 +1,6 @@
 package com.youmin.imsystem.common.common.exception;
 
 import com.youmin.imsystem.common.common.domain.vo.resp.ApiResult;
-import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,10 +18,18 @@ public class GlobalExceptionHandler {
         return ApiResult.fail(CommonErrorEnum.PARAM_VALID.getCode(),message);
     }
 
+    @ExceptionHandler(value = BusinessException.class)
+    public ApiResult<?> businessErrorException(BusinessException e){
+        log.info("Business error exception! Reason is {}",e.getMessage());
+        return ApiResult.fail(e.getErrorCode(),e.getErrorMsg());
+    }
+
     @ExceptionHandler(value = Exception.class)
     public ApiResult<?> systemError(Throwable e){
           log.error("system error! The reason is {}",e.getMessage());
           return ApiResult.fail(CommonErrorEnum.SYSTEM_ERROR);
 
     }
+
+
 }

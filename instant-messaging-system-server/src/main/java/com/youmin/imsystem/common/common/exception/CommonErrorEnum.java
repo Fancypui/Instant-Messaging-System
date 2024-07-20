@@ -9,7 +9,7 @@ public enum CommonErrorEnum implements ErrorEnum {
 
     SYSTEM_ERROR(-1, "System Error"),
     PARAM_VALID(-2, "Parameter Validation Fail"),
-
+    BUSINESS_ERROR(0,"{0}")
     ;
     private final Integer code;
     private final String msg;
