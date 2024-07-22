@@ -1,5 +1,6 @@
 package com.youmin.imsystem.common.user.service.impl;
 
+import com.youmin.imsystem.common.common.annotation.RedissonLock;
 import com.youmin.imsystem.common.common.utils.AssertUtils;
 import com.youmin.imsystem.common.user.cache.ItemCache;
 import com.youmin.imsystem.common.user.dao.ItemConfigDao;
@@ -67,6 +68,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void modifyName(Long uid, String name) {
         User oldUser = userDao.getByName(name);
         AssertUtils.isEmpty(oldUser,"Username already occupied, please change another name");

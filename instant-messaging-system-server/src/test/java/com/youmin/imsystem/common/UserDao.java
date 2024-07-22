@@ -1,7 +1,10 @@
 package com.youmin.imsystem.common;
 
 
+import com.youmin.imsystem.common.common.domain.enums.IdempotentEnum;
 import com.youmin.imsystem.common.user.domain.entity.User;
+import com.youmin.imsystem.common.user.enums.ItemEnum;
+import com.youmin.imsystem.common.user.service.IUserBackpackService;
 import com.youmin.imsystem.common.user.service.LoginService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,10 +27,13 @@ public class UserDao {
     @Autowired
     private LoginService loginService;
 
+    @Autowired
+    private IUserBackpackService iUserBackpackService;
+
 
     @Test
     public void setUserToken(){
-        String token = loginService.login(11000L);
+        iUserBackpackService.acquireItem(11000L, ItemEnum.REG_TOP10_BADGE.getItemId(), IdempotentEnum.UID,11000L+"");
     }
 
 
