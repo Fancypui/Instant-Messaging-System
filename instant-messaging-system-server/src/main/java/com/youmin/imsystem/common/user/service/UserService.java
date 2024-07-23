@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface UserService {
 
-    Long registered(User user);
+    void registered(User user);
 
     UserInfoResp getUserInfo(Long uid);
 

@@ -1,6 +1,7 @@
 package com.youmin.imsystem.common.user.service.impl;
 
 import com.youmin.imsystem.common.common.annotation.RedissonLock;
+import com.youmin.imsystem.common.common.event.UserRegisteredEvent;
 import com.youmin.imsystem.common.common.utils.AssertUtils;
 import com.youmin.imsystem.common.user.cache.ItemCache;
 import com.youmin.imsystem.common.user.dao.ItemConfigDao;
@@ -20,6 +21,8 @@ import com.youmin.imsystem.common.user.service.adapter.UserAdapter;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,16 +45,19 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ItemConfigDao itemConfigDao;
 
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
 
 
 
 
     @Override
     @Transactional
-    public Long registered(User user) {
+    public void registered(User user) {
         userDao.save(user);
-        return user.getId();
-        //todo emit to subscribers who subscribe this user registered event
+        //emit user registration event to subscribers who subscribe this user registered event
+        applicationEventPublisher.publishEvent(new UserRegisteredEvent(this,user));
     }
 
     /**
