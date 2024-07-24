@@ -23,7 +23,7 @@ public class ThreadPoolConfig implements AsyncConfigurer {
 
     @Override
     public Executor getAsyncExecutor() {
-        return null;
+        return imSystemExecutor();
     }
 
     @Bean(name = IMSYSTEM_EXECUTOR)

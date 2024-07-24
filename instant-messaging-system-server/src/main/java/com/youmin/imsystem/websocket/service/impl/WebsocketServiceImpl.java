@@ -1,14 +1,17 @@
 package com.youmin.imsystem.websocket.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.youmin.imsystem.common.common.event.UserOnlineEvent;
 import com.youmin.imsystem.common.user.dao.UserDao;
 import com.youmin.imsystem.common.user.domain.entity.User;
 import com.youmin.imsystem.common.user.service.LoginService;
+import com.youmin.imsystem.websocket.NettyUtils;
 import com.youmin.imsystem.websocket.domain.dto.WSChannelExtraDTO;
 import com.youmin.imsystem.websocket.domain.vo.resp.WSLoginSuccessResp;
 import com.youmin.imsystem.websocket.domain.vo.resp.WSRespBase;
@@ -20,11 +23,13 @@ import lombok.SneakyThrows;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 @Service
@@ -53,6 +58,9 @@ public class WebsocketServiceImpl implements WebsocketService {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 
     public void connect(Channel channel){
         ONLINE_WS_MAP.put(channel, new WSChannelExtraDTO());
@@ -139,7 +147,12 @@ public class WebsocketServiceImpl implements WebsocketService {
     public void loginSuccess(Channel channel, User user, String token){
         WSRespBase<WSLoginSuccessResp> resp = WSAdapter.build(user, token);
         sendMsg(channel,resp);
-
+        //update user latest online time
+        user.setLastOptTime(LocalDateTime.now());
+        //refresh user's latest ip, to get his/her location
+        user.refreshIp(NettyUtils.getAttribute(channel,NettyUtils.IP));
+        //user online event
+        applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
     }
 
     public void authorize(Channel channel,String token){
