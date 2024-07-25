@@ -1,5 +1,6 @@
 package com.youmin.imsystem.common.common.config;
 
+import com.youmin.imsystem.common.common.interceptor.BlackInterceptor;
 import com.youmin.imsystem.common.common.interceptor.CollectorInterceptor;
 import com.youmin.imsystem.common.common.interceptor.TokenInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,16 @@ public class InterceptorConfig implements WebMvcConfigurer {
 
     @Autowired
     private CollectorInterceptor collectorInterceptor;
+    @Autowired
+    private BlackInterceptor blackInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(tokenInterceptor)
                 .addPathPatterns("/capi/**");
         registry.addInterceptor(collectorInterceptor)
+                .addPathPatterns("/capi/**");
+        registry.addInterceptor(blackInterceptor)
                 .addPathPatterns("/capi/**");
     }
 }

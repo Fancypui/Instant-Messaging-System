@@ -37,7 +37,11 @@ public class UserDao {
     }
 
 
-
+    @Test
+    public void jwt() {
+        String login = loginService.login(11003L);
+        System.out.println(login);
+    }
 
     @Test
     public void test(){

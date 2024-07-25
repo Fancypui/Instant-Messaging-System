@@ -8,6 +8,7 @@ import com.youmin.imsystem.websocket.domain.enums.WSRespTypeEnum;
 import com.youmin.imsystem.websocket.domain.vo.req.WSReqBase;
 import com.youmin.imsystem.websocket.service.impl.WebsocketServiceImpl;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
+@ChannelHandler.Sharable
 public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
 

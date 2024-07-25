@@ -1,5 +1,6 @@
 package com.youmin.imsystem.websocket.service.adapter;
 
+import com.youmin.imsystem.common.common.domain.enums.YesOrNoEnum;
 import com.youmin.imsystem.common.user.domain.entity.User;
 import com.youmin.imsystem.websocket.domain.enums.WSRespTypeEnum;
 import com.youmin.imsystem.websocket.domain.vo.resp.WSLoginResp;
@@ -15,13 +16,15 @@ public class WSAdapter {
         wsRespBase.setData(new WSLoginResp(wxMpQrCodeTicket.getUrl()));
         return wsRespBase;
     }
-    public static WSRespBase<WSLoginSuccessResp> build(User user,String token){
+    public static WSRespBase<WSLoginSuccessResp> build(User user,String token, boolean power){
         WSRespBase<WSLoginSuccessResp> wsRespBase = new WSRespBase<>();
         WSLoginSuccessResp build = WSLoginSuccessResp.builder()
                 .uid(user.getId())
                 .avatar(user.getAvatar())
                 .name(user.getName())
-                .token(token).build();
+                .power(power? YesOrNoEnum.YES.getStatus() : YesOrNoEnum.NO.getStatus())
+                .token(token)
+                .build();
         wsRespBase.setType(WSRespTypeEnum.LOGIN_SUCcESS.getType());
         wsRespBase.setData(build);
         return wsRespBase;

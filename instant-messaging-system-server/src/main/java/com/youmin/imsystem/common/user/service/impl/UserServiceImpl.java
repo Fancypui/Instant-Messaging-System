@@ -1,25 +1,30 @@
 package com.youmin.imsystem.common.user.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.youmin.imsystem.common.common.annotation.RedissonLock;
+import com.youmin.imsystem.common.common.event.UserBlackEvent;
 import com.youmin.imsystem.common.common.event.UserRegisteredEvent;
 import com.youmin.imsystem.common.common.utils.AssertUtils;
 import com.youmin.imsystem.common.user.cache.ItemCache;
+import com.youmin.imsystem.common.user.dao.BlackDao;
 import com.youmin.imsystem.common.user.dao.ItemConfigDao;
 import com.youmin.imsystem.common.user.dao.UserBackpackDao;
 import com.youmin.imsystem.common.user.dao.UserDao;
-import com.youmin.imsystem.common.user.domain.entity.ItemConfig;
-import com.youmin.imsystem.common.user.domain.entity.User;
-import com.youmin.imsystem.common.user.domain.entity.UserBackpack;
+import com.youmin.imsystem.common.user.domain.entity.*;
 import com.youmin.imsystem.common.user.domain.vo.req.ModifyNameReq;
+import com.youmin.imsystem.common.user.domain.vo.req.UserBlackReq;
 import com.youmin.imsystem.common.user.domain.vo.req.WearingBadgeReq;
 import com.youmin.imsystem.common.user.domain.vo.resp.BadgesResp;
 import com.youmin.imsystem.common.user.domain.vo.resp.UserInfoResp;
+import com.youmin.imsystem.common.user.enums.BlackTypeEnum;
 import com.youmin.imsystem.common.user.enums.ItemEnum;
 import com.youmin.imsystem.common.user.enums.ItemTypeEnum;
 import com.youmin.imsystem.common.user.service.UserService;
 import com.youmin.imsystem.common.user.service.adapter.UserAdapter;
+import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
+import org.apache.velocity.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -28,9 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -44,6 +51,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ItemConfigDao itemConfigDao;
+    @Autowired
+    private BlackDao blackDao;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -118,6 +127,33 @@ public class UserServiceImpl implements UserService {
         AssertUtils.isNotEmpty(userBackpack,"User does not have that badge");
         //wearing badge
         userDao.wearBadge(uid, wearingBadgeReq.getItemId());
+    }
+
+    @Override
+    @Transactional
+    public void black(UserBlackReq userBlackReq) {
+        Black black = new Black();
+        black.setType(BlackTypeEnum.UID.getType());
+        black.setTarget(userBlackReq.getUid().toString());
+        blackDao.save(black);
+        User user = userDao.getById(userBlackReq.getUid());
+        blackIP(Optional.ofNullable(user.getIpInfo()).map(ipInfo -> ipInfo.getCreateIp()).orElse(null));
+        blackIP(Optional.ofNullable(user.getIpInfo()).map(ipInfo -> ipInfo.getUpdateIp()).orElse(null));
+        applicationEventPublisher.publishEvent(new UserBlackEvent(this,user));
+    }
+
+    private void blackIP(String ip) {
+        if(StrUtil.isBlank(ip)){
+            return;
+        }
+        try {
+            Black insert = new Black();
+            insert.setTarget(ip);
+            insert.setType(BlackTypeEnum.IP.getType());
+            blackDao.save(insert);
+        }catch(Exception e){
+            log.error("duplicate black ip:{}", ip);
+        }
     }
 
 

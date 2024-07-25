@@ -7,9 +7,12 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.youmin.imsystem.common.common.config.ThreadPoolConfig;
 import com.youmin.imsystem.common.common.event.UserOnlineEvent;
 import com.youmin.imsystem.common.user.dao.UserDao;
 import com.youmin.imsystem.common.user.domain.entity.User;
+import com.youmin.imsystem.common.user.enums.RoleEnum;
+import com.youmin.imsystem.common.user.service.IRoleService;
 import com.youmin.imsystem.common.user.service.LoginService;
 import com.youmin.imsystem.websocket.NettyUtils;
 import com.youmin.imsystem.websocket.domain.dto.WSChannelExtraDTO;
@@ -23,7 +26,9 @@ import lombok.SneakyThrows;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -60,7 +65,14 @@ public class WebsocketServiceImpl implements WebsocketService {
     private UserDao userDao;
 
     @Autowired
+    private IRoleService roleService;
+
+    @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    @Qualifier(ThreadPoolConfig.WEBSOCKET_EXECUTOR)
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     public void connect(Channel channel){
         ONLINE_WS_MAP.put(channel, new WSChannelExtraDTO());
@@ -131,6 +143,15 @@ public class WebsocketServiceImpl implements WebsocketService {
         channel.writeAndFlush(new TextWebSocketFrame(JSONUtil.toJsonStr(wsRespBase)));
     }
 
+    public void sendToAll(WSRespBase<?> wsRespBase){
+        ONLINE_WS_MAP.forEach((channel,wtx)->{
+            threadPoolTaskExecutor.execute(()->{
+                sendMsg(channel,wsRespBase);
+            });
+
+        });
+    }
+
     /**
      * generate unique login code
      * @param channel
@@ -145,7 +166,8 @@ public class WebsocketServiceImpl implements WebsocketService {
     }
 
     public void loginSuccess(Channel channel, User user, String token){
-        WSRespBase<WSLoginSuccessResp> resp = WSAdapter.build(user, token);
+        boolean power = roleService.hasPower(user.getId(), RoleEnum.CHAT_MANAGER);
+        WSRespBase<WSLoginSuccessResp> resp = WSAdapter.build(user, token,power);
         sendMsg(channel,resp);
         //update user latest online time
         user.setLastOptTime(LocalDateTime.now());

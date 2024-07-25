@@ -9,11 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WSLoginSuccessResp {
+public class WSBlack {
     private Long uid;
-    private String avatar;
-    private String token;
-    private String name;
-    //todo user permission 0 normal chat member, 1 chat manager
-    private Integer power;
 }

@@ -19,7 +19,9 @@ public class ThreadPoolConfig implements AsyncConfigurer {
     /**
      * Project's share thread pool
      */
-    private static final String IMSYSTEM_EXECUTOR = "IMSystemExecutor";
+    public static final String IMSYSTEM_EXECUTOR = "IMSystemExecutor";
+
+    public static final String WEBSOCKET_EXECUTOR = "WebsocketExecutor";
 
     @Override
     public Executor getAsyncExecutor() {
@@ -35,6 +37,18 @@ public class ThreadPoolConfig implements AsyncConfigurer {
         executor.setThreadNamePrefix(IMSYSTEM_EXECUTOR);
         executor.setQueueCapacity(200);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setThreadFactory(new MyThreadFactory(executor));
+        executor.initialize();
+        return executor;
+    }
+    @Bean(name = WEBSOCKET_EXECUTOR)
+    public ThreadPoolTaskExecutor websocketExecutor(){
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(16);
+        executor.setMaxPoolSize(16);
+        executor.setQueueCapacity(1000);//support pushing msg to 1000 user
+        executor.setThreadNamePrefix("websocket-executor-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());//discard if full
         executor.setThreadFactory(new MyThreadFactory(executor));
         executor.initialize();
         return executor;

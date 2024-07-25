@@ -15,6 +15,7 @@ import com.youmin.imsystem.common.user.domain.entity.User;
 import com.youmin.imsystem.common.user.service.IpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Objects;
@@ -27,6 +28,7 @@ import java.util.concurrent.TimeUnit;
  * Service that update location info of user based on ip address
  */
 @Slf4j
+@Service
 public class IpServiceImpl implements IpService {
 
     private static final ExecutorService EXECUTOR = new ThreadPoolExecutor(1, 1,
