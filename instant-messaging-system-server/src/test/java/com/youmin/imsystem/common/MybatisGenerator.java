@@ -56,7 +56,7 @@ public class MybatisGenerator {
         strategyConfig.setEntityTableFieldAnnotationEnable(true);
 
         strategyConfig.setInclude(
-                "black","role","user_role"
+                "user_friend","user_apply"
         );
 
         List<TableFill> list = new ArrayList<TableFill>();
