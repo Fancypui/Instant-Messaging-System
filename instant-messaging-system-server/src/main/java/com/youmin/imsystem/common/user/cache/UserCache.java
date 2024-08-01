@@ -35,7 +35,7 @@ public class UserCache {
         return userRole.stream().map(UserRole::getRoleId).collect(Collectors.toSet());
     }
 
-    @Cacheable(cacheNames = "user", key = "'blackList")
+    @Cacheable(cacheNames = "user", key = "'blackList'")
     public Map<Integer,Set<String>> blackMap(){
         Map<Integer, List<Black>> filter = blackDao.list().stream().collect(Collectors.groupingBy(Black::getType));
         Map<Integer, Set<String>> result = new HashMap<>();
