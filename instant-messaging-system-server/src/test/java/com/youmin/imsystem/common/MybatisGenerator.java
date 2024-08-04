@@ -37,7 +37,7 @@ public class MybatisGenerator {
         autoGenerator.setGlobalConfig(globalConfig);
 
         PackageConfig packageConfig = new PackageConfig();
-        packageConfig.setParent("com.youmin.imsystem.common.user");
+        packageConfig.setParent("com.youmin.imsystem.common.chat");
         packageConfig.setEntity("domain.entity");
         packageConfig.setMapper("mapper");
         packageConfig.setController("controller");
@@ -56,7 +56,7 @@ public class MybatisGenerator {
         strategyConfig.setEntityTableFieldAnnotationEnable(true);
 
         strategyConfig.setInclude(
-                "user_friend","user_apply"
+                "room_friend","room"
         );
 
         List<TableFill> list = new ArrayList<TableFill>();
