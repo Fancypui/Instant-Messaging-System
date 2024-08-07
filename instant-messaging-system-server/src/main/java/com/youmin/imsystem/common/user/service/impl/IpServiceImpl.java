@@ -7,6 +7,8 @@ import cn.hutool.json.JSONUtil;
 import com.youmin.imsystem.common.common.domain.vo.resp.ApiResult;
 import com.youmin.imsystem.common.common.handler.GlobalUncaughtExceptionHandler;
 import com.youmin.imsystem.common.common.utils.JsonUtils;
+import com.youmin.imsystem.common.user.cache.UserCache;
+import com.youmin.imsystem.common.user.cache.UserInfoCache;
 import com.youmin.imsystem.common.user.dao.UserDao;
 import com.youmin.imsystem.common.user.domain.dto.IpResult;
 import com.youmin.imsystem.common.user.domain.entity.IpDetail;
@@ -41,6 +43,9 @@ public class IpServiceImpl implements IpService {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private UserCache userCache;
+
     @Override
     public void refreshIpDetail(Long uid) {
         EXECUTOR.execute(()->{
@@ -61,6 +66,7 @@ public class IpServiceImpl implements IpService {
                 update.setId(user.getId());
                 update.setIpInfo(ipInfo);
                 userDao.updateById(update);
+                userCache.userInfoChange(uid);
             }
         });
 

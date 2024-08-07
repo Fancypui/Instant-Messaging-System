@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 @Service
@@ -170,7 +171,7 @@ public class WebsocketServiceImpl implements WebsocketService {
         WSRespBase<WSLoginSuccessResp> resp = WSAdapter.build(user, token,power);
         sendMsg(channel,resp);
         //update user latest online time
-        user.setLastOptTime(LocalDateTime.now());
+        user.setLastOptTime(new Date());
         //refresh user's latest ip, to get his/her location
         user.refreshIp(NettyUtils.getAttribute(channel,NettyUtils.IP));
         //user online event

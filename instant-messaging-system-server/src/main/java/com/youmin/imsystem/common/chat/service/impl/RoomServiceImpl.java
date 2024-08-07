@@ -44,8 +44,8 @@ public class RoomServiceImpl implements IRoomService {
 
     @Override
     public void disableFriendRoom(List<Long> uidList) {
-        AssertUtils.isNotEmpty(uidList,"Cannot create friend room, no user provided");
-        AssertUtils.equal(uidList.size(),2,"Cannot create friend room; no of user is not enough to create a friend chat room");
+        AssertUtils.isNotEmpty(uidList,"Cannot disable friend room, no user provided");
+        AssertUtils.equal(uidList.size(),2,"Cannot disable friend room; no of user is not enough to create a friend chat room");
         String roomKey = ChatAdapter.generateKey(uidList);
         roomFriendDao.disableRoom(roomKey);
 

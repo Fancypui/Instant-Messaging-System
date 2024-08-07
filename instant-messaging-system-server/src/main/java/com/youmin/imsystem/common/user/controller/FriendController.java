@@ -30,6 +30,7 @@ public class FriendController {
     @Autowired
     private FriendService friendService;
 
+    //done
     @GetMapping("/page")
     @ApiOperation("friend list")
     public ApiResult<CursorPageBaseResp<FriendResp>> friendPage(@Valid CursorBaseReq friendPageReq){
@@ -37,6 +38,7 @@ public class FriendController {
         return ApiResult.success(friendService.friendList(friendPageReq,uid));
     }
 
+    //done
     @GetMapping("/check")
     @ApiOperation("Batch check if provided uid is the friend of the current user")
     public ApiResult<FriendCheckResp> friendCheck(@Valid FriendCheckReq friendCheckReq){
@@ -44,14 +46,16 @@ public class FriendController {
         return ApiResult.success(friendService.friendCheck(friendCheckReq,uid));
     }
 
+    //done
     @PostMapping("/apply")
     @ApiOperation("Send a Friend Request to target user")
-    public ApiResult<Void> sendFriendRequest(@Valid FriendApplyReq request){
+    public ApiResult<Void> sendFriendRequest(@Valid @RequestBody FriendApplyReq request){
         Long uid = RequestHolder.get().getUid();
         friendService.sendFriendRequest(request,uid);
         return ApiResult.success();
     }
 
+    //done
     @GetMapping("/unread")
     @ApiOperation("Send a Friend Request to target user")
     public ApiResult<FriendUnreadResp> unread(){
@@ -59,6 +63,7 @@ public class FriendController {
         return ApiResult.success(friendService.unread(uid));
     }
 
+    //done
     @GetMapping("/apply/page")
     @ApiOperation("Get current user's Apply Page")
     public ApiResult<PageBaseResp<FriendApplyResp>> applyPage(@Valid PageBaseReq request){
@@ -66,9 +71,11 @@ public class FriendController {
         return ApiResult.success(friendService.applyPage(request,uid));
     }
 
+
+    //done
     @PutMapping("/apply")
     @ApiOperation("Apply a friend request")
-    public ApiResult<Void> applyApprove(@Valid FriendApplyApproveReq request){
+    public ApiResult<Void> applyApprove(@Valid @RequestBody FriendApplyApproveReq request){
         Long uid = RequestHolder.get().getUid();
         friendService.applyApprove(request,uid);
         return ApiResult.success();
@@ -76,7 +83,7 @@ public class FriendController {
 
     @DeleteMapping("")
     @ApiOperation("Delete Friend")
-    public ApiResult<Void> deleteFriend(@Valid FriendDeleteReq request){
+    public ApiResult<Void> deleteFriend(@Valid @RequestBody FriendDeleteReq request){
         Long uid = RequestHolder.get().getUid();
         friendService.deleteFriend(request,uid);
         return ApiResult.success();

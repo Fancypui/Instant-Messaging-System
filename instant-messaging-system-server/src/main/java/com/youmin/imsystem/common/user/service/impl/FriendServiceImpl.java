@@ -139,7 +139,7 @@ public class FriendServiceImpl implements FriendService {
         AssertUtils.equal(userApply.getStatus(), UserApplyStatusEnum.WAIT_APPROVING.getStatusCode(),"Cannot approve friend request, " +
                 "it has been approved");
         userApplyDao.approveApply(request.getApplyId());//update status of friend requeswt to approve
-        createFriend(uid,userApply.getTargetId());
+        createFriend(uid,userApply.getUid());
         RoomFriend friendRoom = roomService.createFriendRoom(Arrays.asList(userApply.getTargetId(), userApply.getUid()));
 
         //todo send a msg to the newly created friend room, notifying users where both of them are friend now can start chatting
@@ -152,8 +152,8 @@ public class FriendServiceImpl implements FriendService {
         save1.setFriendUid(friendUid);
         save1.setDeleteStatus(YesOrNoEnum.NO.getStatus());
         UserFriend save2 = new UserFriend();
-        save2.setUid(uid);
-        save2.setFriendUid(friendUid);
+        save2.setUid(friendUid);
+        save2.setFriendUid(uid);
         save2.setDeleteStatus(YesOrNoEnum.NO.getStatus());
         userFriendDao.saveBatch(Lists.newArrayList(save1,save2));
     }

@@ -56,7 +56,7 @@ public class MybatisGenerator {
         strategyConfig.setEntityTableFieldAnnotationEnable(true);
 
         strategyConfig.setInclude(
-                "room_friend","room"
+                "room_group","group_member","contact","message"
         );
 
         List<TableFill> list = new ArrayList<TableFill>();

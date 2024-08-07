@@ -1,5 +1,7 @@
 package com.youmin.imsystem.common.user.cache;
 
+import com.youmin.imsystem.common.common.constant.RedisConstant;
+import com.youmin.imsystem.common.common.utils.RedisUtils;
 import com.youmin.imsystem.common.user.dao.BlackDao;
 import com.youmin.imsystem.common.user.dao.ItemConfigDao;
 import com.youmin.imsystem.common.user.dao.UserRoleDao;
@@ -13,10 +15,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -25,8 +24,26 @@ public class UserCache {
     @Autowired
     private UserRoleDao userRoleDao;
 
+
     @Autowired
     private BlackDao blackDao;
+
+    @Autowired
+    private UserInfoCache userInfoCache;
+
+    @Autowired
+    private UserSummaryCache userSummaryCache;
+
+    public void userInfoChange(Long uid){
+        userInfoCache.delete(uid);
+        userSummaryCache.delete(uid);
+        refreshModifyTime(uid);
+    }
+
+    private void refreshModifyTime(Long uid) {
+        String key = RedisConstant.getKey(RedisConstant.USER_MODIFY_STRING, uid);
+        RedisUtils.set(key,new Date().getTime());
+    }
 
 
     @Cacheable(cacheNames = "user", key = "'roles'+#uid")
@@ -51,4 +68,11 @@ public class UserCache {
         return null;
     }
 
+    public List<Long> getUserModifyTime(List<Long> uidList) {
+        List<String> keys = uidList.stream().
+                map(uid -> {
+                    return RedisConstant.getKey(RedisConstant.USER_MODIFY_STRING, uid);
+                }).collect(Collectors.toList());
+        return RedisUtils.mget(keys,Long.class);
+    }
 }

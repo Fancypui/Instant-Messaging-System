@@ -1,17 +1,21 @@
 package com.youmin.imsystem.common.user.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.youmin.imsystem.common.common.annotation.RedissonLock;
 import com.youmin.imsystem.common.common.event.UserBlackEvent;
 import com.youmin.imsystem.common.common.event.UserRegisteredEvent;
 import com.youmin.imsystem.common.common.utils.AssertUtils;
 import com.youmin.imsystem.common.user.cache.ItemCache;
+import com.youmin.imsystem.common.user.cache.UserCache;
+import com.youmin.imsystem.common.user.cache.UserSummaryCache;
 import com.youmin.imsystem.common.user.dao.BlackDao;
 import com.youmin.imsystem.common.user.dao.ItemConfigDao;
 import com.youmin.imsystem.common.user.dao.UserBackpackDao;
 import com.youmin.imsystem.common.user.dao.UserDao;
+import com.youmin.imsystem.common.user.domain.dto.ItemInfoDTO;
+import com.youmin.imsystem.common.user.domain.dto.SummaryUserInfoDTO;
 import com.youmin.imsystem.common.user.domain.entity.*;
-import com.youmin.imsystem.common.user.domain.vo.req.ModifyNameReq;
+import com.youmin.imsystem.common.user.domain.vo.req.ItemInfoReq;
+import com.youmin.imsystem.common.user.domain.vo.req.SummaryUserInfoReq;
 import com.youmin.imsystem.common.user.domain.vo.req.UserBlackReq;
 import com.youmin.imsystem.common.user.domain.vo.req.WearingBadgeReq;
 import com.youmin.imsystem.common.user.domain.vo.resp.BadgesResp;
@@ -22,19 +26,14 @@ import com.youmin.imsystem.common.user.enums.ItemTypeEnum;
 import com.youmin.imsystem.common.user.service.UserService;
 import com.youmin.imsystem.common.user.service.adapter.UserAdapter;
 import lombok.extern.slf4j.Slf4j;
-import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
-import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
-import org.apache.velocity.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -53,6 +52,12 @@ public class UserServiceImpl implements UserService {
     private ItemConfigDao itemConfigDao;
     @Autowired
     private BlackDao blackDao;
+
+    @Autowired
+    private UserCache userCache;
+
+    @Autowired
+    private UserSummaryCache userSummaryCache;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -94,6 +99,8 @@ public class UserServiceImpl implements UserService {
          */
         if(userBackpackDao.useItem(modifyNameCard)){
             userDao.modifyName(uid,name);
+            //delete cache
+            userCache.userInfoChange(uid);
         }
 
     }
@@ -127,6 +134,8 @@ public class UserServiceImpl implements UserService {
         AssertUtils.isNotEmpty(userBackpack,"User does not have that badge");
         //wearing badge
         userDao.wearBadge(uid, wearingBadgeReq.getItemId());
+        //delete cache
+        userCache.userInfoChange(uid);
     }
 
     @Override
@@ -140,6 +149,60 @@ public class UserServiceImpl implements UserService {
         blackIP(Optional.ofNullable(user.getIpInfo()).map(ipInfo -> ipInfo.getCreateIp()).orElse(null));
         blackIP(Optional.ofNullable(user.getIpInfo()).map(ipInfo -> ipInfo.getUpdateIp()).orElse(null));
         applicationEventPublisher.publishEvent(new UserBlackEvent(this,user));
+    }
+
+    /**
+     * get item info (badges) from spring cache (caffeine)
+     *
+     * @param request
+     * @return
+     */
+    @Override
+    public List<ItemInfoDTO> getItemInfo(ItemInfoReq request) {
+        return request.getItemInfoList().stream()
+                .map(itemInfo -> {
+                    ItemConfig itemConfig = itemCache.getById(itemInfo.getItemId());
+                    if(Objects.nonNull(itemInfo.getLastModifyTime())&&itemConfig.getUpdateTime().getTime()<=itemInfo.getLastModifyTime()){
+                        return ItemInfoDTO.skip(itemInfo.getItemId());
+                    }
+                    //convert to itemInfoDTO
+                    ItemInfoDTO itemInfoDTO = new ItemInfoDTO();
+                    itemInfoDTO.setNeedRefresh(Boolean.TRUE);
+                    itemInfoDTO.setItemId(itemConfig.getId());
+                    itemInfoDTO.setImg(itemConfig.getImg());
+                    itemInfoDTO.setDesc(itemConfig.getDescribe());
+                    return itemInfoDTO;
+                }).collect(Collectors.toList());
+
+    }
+
+    @Override
+    public List<SummaryUserInfoDTO> getSummaryUserInfo(SummaryUserInfoReq request) {
+        //get the uid that requiring to be refresh
+       List<Long> needRefreshUid =  getNeedSyncUidList(request.getUserInfoReqList());
+       //load user summary info
+       Map<Long,SummaryUserInfoDTO> summaryUserInfo = userSummaryCache.getBatch(needRefreshUid);
+       return request.getUserInfoReqList().stream()
+               .map(a->{
+                   if(!summaryUserInfo.containsKey(a.getUid())){
+                       return SummaryUserInfoDTO.skip(a.getUid());
+                   }
+                   return summaryUserInfo.get(a.getUid());
+               }).collect(Collectors.toList());
+    }
+
+    private List<Long> getNeedSyncUidList(List<SummaryUserInfoReq.UserInfoReq> reqList) {
+        ArrayList<Long> needSyncUidList = new ArrayList<>();
+        List<Long> userModifyTime = userCache.
+                getUserModifyTime(reqList.stream().map(SummaryUserInfoReq.UserInfoReq::getUid).collect(Collectors.toList()));
+        for (int i = 0; i < reqList.size(); i++) {
+            SummaryUserInfoReq.UserInfoReq userInfoReq = reqList.get(i);
+            Long modifyTime = userModifyTime.get(i);
+            if(Objects.isNull(userInfoReq.getLastModifyTime())||(Objects.nonNull(modifyTime)&&modifyTime>userInfoReq.getLastModifyTime())){
+                needSyncUidList.add(userInfoReq.getUid());
+            }
+        }
+        return needSyncUidList;
     }
 
     private void blackIP(String ip) {
