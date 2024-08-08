@@ -1,4 +1,4 @@
-package com.youmin.imsystem.common.chat.enums;
+package com.youmin.imsystem.common.chat.domain.enums;
 
 import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;

@@ -2,8 +2,8 @@ package com.youmin.imsystem.common.chat.service.adapter;
 
 import com.youmin.imsystem.common.chat.domain.entity.Room;
 import com.youmin.imsystem.common.chat.domain.entity.RoomFriend;
-import com.youmin.imsystem.common.chat.enums.HotFlagEnum;
-import com.youmin.imsystem.common.chat.enums.RoomTypeEnums;
+import com.youmin.imsystem.common.chat.domain.enums.HotFlagEnum;
+import com.youmin.imsystem.common.chat.domain.enums.RoomTypeEnums;
 import com.youmin.imsystem.common.common.domain.enums.NormalOrNotEnum;
 
 import java.util.List;

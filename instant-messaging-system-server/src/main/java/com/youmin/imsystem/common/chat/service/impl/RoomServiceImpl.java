@@ -4,7 +4,7 @@ import com.youmin.imsystem.common.chat.dao.RoomDao;
 import com.youmin.imsystem.common.chat.dao.RoomFriendDao;
 import com.youmin.imsystem.common.chat.domain.entity.Room;
 import com.youmin.imsystem.common.chat.domain.entity.RoomFriend;
-import com.youmin.imsystem.common.chat.enums.RoomTypeEnums;
+import com.youmin.imsystem.common.chat.domain.enums.RoomTypeEnums;
 import com.youmin.imsystem.common.chat.service.IRoomService;
 import com.youmin.imsystem.common.chat.service.adapter.ChatAdapter;
 import com.youmin.imsystem.common.common.domain.enums.NormalOrNotEnum;

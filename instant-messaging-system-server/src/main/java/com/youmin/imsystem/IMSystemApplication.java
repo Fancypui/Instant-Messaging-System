@@ -7,7 +7,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 @SpringBootApplication(scanBasePackages = {"com.youmin.imsystem"})
 @MapperScan({"com.youmin.imsystem.common.**.mapper"})
-
 public class IMSystemApplication {
     public static void main(String[] args) {
         SpringApplication.run(IMSystemApplication.class,args);
