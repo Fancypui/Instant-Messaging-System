@@ -23,7 +23,6 @@ public class TextMsgReq {
     @ApiModelProperty("message content")
     private String content;
 
-    @NotNull
     @ApiModelProperty("roomId")
     private Long replyMsgId;
 
