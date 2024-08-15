@@ -7,7 +7,7 @@ import com.youmin.imsystem.common.user.service.UserService;
 import com.youmin.imsystem.common.user.service.WxMsgService;
 import com.youmin.imsystem.common.user.service.adapter.TextBuilder;
 import com.youmin.imsystem.common.user.service.adapter.UserAdapter;
-import com.youmin.imsystem.websocket.service.WebsocketService;
+import com.youmin.imsystem.common.user.service.WebsocketService;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.mp.api.WxMpService;
@@ -15,7 +15,6 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;

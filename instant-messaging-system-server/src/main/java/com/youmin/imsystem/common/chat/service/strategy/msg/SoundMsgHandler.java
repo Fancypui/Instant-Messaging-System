@@ -15,6 +15,12 @@ public class SoundMsgHandler extends AbstractMsgHandler<SoundMsgDTO> {
 
     @Autowired
     private MessageDao messageDao;
+
+    @Override
+    public Object showMsg(Message msg) {
+        return msg.getExtra().getSoundMsgDTO();
+    }
+
     @Override
     protected void saveMsg(Message message, SoundMsgDTO body) {
         MessageExtra msgExtra = Optional.ofNullable(message.getExtra()).orElse(new MessageExtra());

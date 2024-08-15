@@ -26,6 +26,6 @@ public class ChatController {
     @PostMapping("/msg")
     public ApiResult<?> sendMsg(@Valid @RequestBody ChatMessageReq request){
         Long msgId = chatService.sendMsg(request, RequestHolder.get().getUid());
-        return null;
+        return ApiResult.success(chatService.getMsgResp(msgId, RequestHolder.get().getUid()));
     }
 }

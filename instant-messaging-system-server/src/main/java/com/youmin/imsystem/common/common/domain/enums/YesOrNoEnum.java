@@ -12,4 +12,8 @@ public enum YesOrNoEnum {
 
     private final Integer status;
     private final String desc;
+
+    public static Integer toStatus(Boolean bool){
+        return bool? YES.getStatus() : NO.getStatus();
+    }
 }

@@ -53,6 +53,7 @@ public abstract class AbstractMsgHandler<Req> {
         }
         return BeanUtil.toBean(body,this.reqClass);
     }
+    public abstract Object showMsg(Message msg);
 
     protected void checkMsg(Req body,Long roomId,Long uid){
 

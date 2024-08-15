@@ -1,7 +1,7 @@
 package com.youmin.imsystem.common.common.service.cache;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.youmin.imsystem.common.common.utils.RedisUtils;
+import com.youmin.imsystem.common.utils.RedisUtils;
 import javafx.util.Pair;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;

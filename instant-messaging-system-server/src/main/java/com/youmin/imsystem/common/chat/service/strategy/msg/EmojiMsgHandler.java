@@ -14,6 +14,12 @@ import java.util.Optional;
 public class EmojiMsgHandler extends AbstractMsgHandler<EmojiMsgDTO> {
     @Autowired
     private MessageDao messageDao;
+
+    @Override
+    public Object showMsg(Message msg) {
+        return msg.getExtra().getEmojiMsgDTO();
+    }
+
     @Override
     protected void saveMsg(Message message, EmojiMsgDTO body) {
         MessageExtra msgExtra = Optional.ofNullable(message.getExtra()).orElse(new MessageExtra());

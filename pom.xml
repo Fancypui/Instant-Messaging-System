@@ -11,6 +11,7 @@
     <modules>
         <module>instant-messaging-system-server</module>
         <module>instant-messaging-system-framework</module>
+        <module>instant-messaging-system-framework/instant-messaging-system-transaction</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -43,6 +44,7 @@
         <jsoup.version>1.15.3</jsoup.version>
         <okhttp.version>4.8.1</okhttp.version>
         <redisson-spring-boot-starter.version>3.17.1</redisson-spring-boot-starter.version>
+        <fastjson.version>2.0.41</fastjson.version>
     </properties>
 
     <dependencyManagement>
@@ -121,6 +123,16 @@
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>${redisson-spring-boot-starter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

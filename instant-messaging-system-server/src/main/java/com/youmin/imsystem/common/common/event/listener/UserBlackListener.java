@@ -1,17 +1,14 @@
 package com.youmin.imsystem.common.common.event.listener;
 
-import com.youmin.imsystem.common.common.domain.enums.YesOrNoEnum;
 import com.youmin.imsystem.common.common.event.UserBlackEvent;
-import com.youmin.imsystem.common.common.event.UserOnlineEvent;
 import com.youmin.imsystem.common.user.cache.UserCache;
 import com.youmin.imsystem.common.user.dao.UserDao;
 import com.youmin.imsystem.common.user.domain.entity.User;
-import com.youmin.imsystem.common.user.enums.UserActiveStatusEnum;
 import com.youmin.imsystem.common.user.service.IpService;
-import com.youmin.imsystem.websocket.domain.enums.WSRespTypeEnum;
-import com.youmin.imsystem.websocket.domain.vo.resp.WSBlack;
-import com.youmin.imsystem.websocket.domain.vo.resp.WSRespBase;
-import com.youmin.imsystem.websocket.service.WebsocketService;
+import com.youmin.imsystem.common.user.enums.WSRespTypeEnum;
+import com.youmin.imsystem.common.user.domain.vo.resp.WSBlack;
+import com.youmin.imsystem.common.user.domain.vo.resp.WSRespBase;
+import com.youmin.imsystem.common.user.service.WebsocketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;

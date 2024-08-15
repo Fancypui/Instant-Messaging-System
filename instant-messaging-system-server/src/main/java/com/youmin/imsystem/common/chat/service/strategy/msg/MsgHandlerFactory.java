@@ -1,5 +1,6 @@
 package com.youmin.imsystem.common.chat.service.strategy.msg;
 
+import com.youmin.imsystem.common.chat.domain.entity.Message;
 import com.youmin.imsystem.common.common.exception.CommonErrorEnum;
 import com.youmin.imsystem.common.common.utils.AssertUtils;
 import io.swagger.models.auth.In;
@@ -22,4 +23,5 @@ public class MsgHandlerFactory {
         AssertUtils.isNotEmpty(strategy, CommonErrorEnum.PARAM_VALID);
         return strategy;
     }
+
 }

@@ -1,15 +1,12 @@
 package com.youmin.imsystem.common.user.cache;
 
 import com.youmin.imsystem.common.common.constant.RedisConstant;
-import com.youmin.imsystem.common.common.utils.RedisUtils;
 import com.youmin.imsystem.common.user.dao.BlackDao;
-import com.youmin.imsystem.common.user.dao.ItemConfigDao;
 import com.youmin.imsystem.common.user.dao.UserRoleDao;
 import com.youmin.imsystem.common.user.domain.entity.Black;
-import com.youmin.imsystem.common.user.domain.entity.ItemConfig;
-import com.youmin.imsystem.common.user.domain.entity.Role;
+import com.youmin.imsystem.common.user.domain.entity.User;
 import com.youmin.imsystem.common.user.domain.entity.UserRole;
-import io.swagger.models.auth.In;
+import com.youmin.imsystem.common.utils.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -75,4 +72,6 @@ public class UserCache {
                 }).collect(Collectors.toList());
         return RedisUtils.mget(keys,Long.class);
     }
+
+
 }

@@ -12,6 +12,12 @@ import java.util.Optional;
 @Component
 public class ImgMsgHandler extends AbstractMsgHandler<ImgMsgDTO> {
     private MessageDao messageDao;
+
+    @Override
+    public Object showMsg(Message msg) {
+        return msg.getExtra().getImgMsgDTO();
+    }
+
     @Override
     protected void saveMsg(Message message, ImgMsgDTO body) {
         MessageExtra msgExtra = Optional.ofNullable(message.getExtra()).orElse(new MessageExtra());

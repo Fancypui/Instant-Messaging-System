@@ -8,6 +8,7 @@ public class NettyUtils {
 
     public static final AttributeKey<String> TOKEN = AttributeKey.valueOf("TOKEN");
     public static final AttributeKey<String> IP = AttributeKey.valueOf("IP");
+    public static final AttributeKey<Long> UID = AttributeKey.valueOf("UID");
 
     public static <T> void setAttribute(Channel channel, AttributeKey<T> key, T value){
         Attribute<T> attrKey = channel.attr(key);

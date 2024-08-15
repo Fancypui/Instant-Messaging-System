@@ -1,5 +1,6 @@
 package com.youmin.imsystem.common.common.config;
 
+import com.youmin.imsystem.transaction.annotation.SecureInvokeConfigurer;
 import com.youmin.imsystem.common.common.factory.MyThreadFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +16,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Configuration
 @EnableAsync
-public class ThreadPoolConfig implements AsyncConfigurer {
+public class ThreadPoolConfig implements AsyncConfigurer, SecureInvokeConfigurer {
     /**
      * Project's share thread pool
      */
@@ -25,6 +26,11 @@ public class ThreadPoolConfig implements AsyncConfigurer {
 
     @Override
     public Executor getAsyncExecutor() {
+        return imSystemExecutor();
+    }
+
+    @Override
+    public Executor getSecureInvokeExecutor() {
         return imSystemExecutor();
     }
 

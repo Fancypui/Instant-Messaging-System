@@ -14,6 +14,12 @@ import java.util.Optional;
 public class FileMsgHandler extends AbstractMsgHandler<FileMsgDTO>{
     @Autowired
     private MessageDao messageDao;
+
+    @Override
+    public Object showMsg(Message msg) {
+        return msg.getExtra().getFileMsgDTO();
+    }
+
     @Override
     protected void saveMsg(Message message, FileMsgDTO body) {
         MessageExtra msgExtra = Optional.ofNullable(message.getExtra()).orElse(new MessageExtra());

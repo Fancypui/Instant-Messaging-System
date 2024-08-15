@@ -6,10 +6,16 @@ import com.youmin.imsystem.common.chat.dao.MessageDao;
 import com.youmin.imsystem.common.chat.domain.entity.Message;
 import com.youmin.imsystem.common.chat.domain.entity.RoomGroup;
 import com.youmin.imsystem.common.chat.domain.entity.msg.MessageExtra;
+import com.youmin.imsystem.common.chat.domain.enums.MessageStatusEnum;
 import com.youmin.imsystem.common.chat.domain.enums.MessageTypeEnum;
 import com.youmin.imsystem.common.chat.domain.vo.request.msg.TextMsgReq;
+import com.youmin.imsystem.common.chat.domain.vo.response.msg.TextMsgResp;
+import com.youmin.imsystem.common.chat.service.adapter.MessageAdapter;
+import com.youmin.imsystem.common.chat.service.cache.MsgCache;
 import com.youmin.imsystem.common.chat.service.cache.RoomGroupCache;
+import com.youmin.imsystem.common.common.domain.enums.YesOrNoEnum;
 import com.youmin.imsystem.common.common.utils.AssertUtils;
+import com.youmin.imsystem.common.user.cache.UserCache;
 import com.youmin.imsystem.common.user.cache.UserInfoCache;
 import com.youmin.imsystem.common.user.domain.entity.User;
 import com.youmin.imsystem.common.user.enums.RoleEnum;
@@ -34,8 +40,37 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgReq>{
 
     @Autowired
     private UserInfoCache userInfoCache;
+
     @Autowired
     private IRoleService roleService;
+
+    @Autowired
+    private MsgCache msgCache;
+
+    @Override
+    public Object showMsg(Message msg) {
+        TextMsgResp resp = new TextMsgResp();
+        resp.setContent(msg.getContent());
+        resp.setAtUidList(Optional.ofNullable(msg.getExtra()).map(MessageExtra::getAtUidList).orElse(null));
+        //reply message
+        Optional<Message> reply = Optional.ofNullable(msg.getReplyMsgId())
+                .map(msgCache::getMsg)
+                .filter(a -> Objects.equals(a.getStatus(), MessageStatusEnum.NORMAL));
+        if(reply.isPresent()){
+            Message replyMessage = reply.get();
+            TextMsgResp.ReplyMsg replyVO = new TextMsgResp.ReplyMsg();
+            replyVO.setId(replyMessage.getId());
+            replyVO.setUid(replyMessage.getFromUid());
+            replyVO.setType(replyMessage.getType());
+            replyVO.setBody(MsgHandlerFactory.getStrategyOrNull(replyMessage.getType()).showMsg(replyMessage));
+            User user = userInfoCache.get(replyMessage.getFromUid());
+            replyVO.setUsername(user.getName());
+            replyVO.setCanCallBack(YesOrNoEnum.toStatus(Objects.nonNull(msg.getGapCount())&& msg.getGapCount()<= MessageAdapter.CAN_CALLBACK_GAP_COUNT));
+            replyVO.setGapCount(msg.getGapCount());
+            resp.setReply(replyVO);
+        }
+        return resp;
+    }
 
     @Override
     protected void checkMsg(TextMsgReq body, Long roomId, Long uid) {

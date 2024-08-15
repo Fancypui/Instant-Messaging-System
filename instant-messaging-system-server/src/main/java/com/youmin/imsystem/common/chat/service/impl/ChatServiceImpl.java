@@ -1,14 +1,12 @@
 package com.youmin.imsystem.common.chat.service.impl;
 
-import com.youmin.imsystem.common.chat.dao.GroupMemberDao;
-import com.youmin.imsystem.common.chat.dao.RoomFriendDao;
-import com.youmin.imsystem.common.chat.dao.RoomGroupDao;
-import com.youmin.imsystem.common.chat.domain.entity.GroupMember;
-import com.youmin.imsystem.common.chat.domain.entity.Room;
-import com.youmin.imsystem.common.chat.domain.entity.RoomFriend;
-import com.youmin.imsystem.common.chat.domain.entity.RoomGroup;
+import cn.hutool.core.collection.CollectionUtil;
+import com.youmin.imsystem.common.chat.dao.*;
+import com.youmin.imsystem.common.chat.domain.entity.*;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageReq;
+import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageResp;
 import com.youmin.imsystem.common.chat.service.ChatService;
+import com.youmin.imsystem.common.chat.service.adapter.MessageAdapter;
 import com.youmin.imsystem.common.chat.service.cache.RoomCache;
 import com.youmin.imsystem.common.chat.service.cache.RoomGroupCache;
 import com.youmin.imsystem.common.chat.service.strategy.msg.AbstractMsgHandler;
@@ -16,11 +14,18 @@ import com.youmin.imsystem.common.chat.service.strategy.msg.MsgHandlerFactory;
 import com.youmin.imsystem.common.common.domain.enums.NormalOrNotEnum;
 import com.youmin.imsystem.common.common.event.MessageSendEvent;
 import com.youmin.imsystem.common.common.utils.AssertUtils;
+import javafx.print.Collation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ChatServiceImpl implements ChatService {
@@ -30,9 +35,12 @@ public class ChatServiceImpl implements ChatService {
 
     @Autowired
     private RoomGroupCache roomGroupCache;
+    @Autowired
+    private MessageDao messageDao;
 
 
-
+    @Autowired
+    private MessageMarkDao messageMarkDao;
 
     @Autowired
     private RoomFriendDao roomFriendDao;
@@ -56,6 +64,8 @@ public class ChatServiceImpl implements ChatService {
         return msgId;
     }
 
+
+
     private void check(ChatMessageReq req,Long uid){
         Room room = roomCache.get(req.getRoomId());
         if(room.isHot()){//big group skip validation
@@ -74,6 +84,28 @@ public class ChatServiceImpl implements ChatService {
             GroupMember groupMember = groupMemberDao.getMember(roomGroup.getRoomId(), uid);
             AssertUtils.isNotEmpty(groupMember,"You have been remove from the group");
         }
+
+    }
+
+    @Override
+    public ChatMessageResp getMsgResp(Message message, Long receiveUid) {
+        return CollectionUtil.getFirst(getBatchMsgResp(Collections.singletonList(message),receiveUid));
+    }
+
+    @Override
+    public ChatMessageResp getMsgResp(Long msgId, Long receiverUid) {
+        Message message = messageDao.getById(msgId);
+        return getMsgResp(message,receiverUid);
+    }
+
+    public List<ChatMessageResp> getBatchMsgResp(List<Message> messages, Long receiveUid) {
+        if(CollectionUtil.isEmpty(messages)){
+            return new ArrayList<>();
+        }
+        //query messageMarks
+        List<MessageMark> messageMarks = messageMarkDao.getValidBatchMessageMark(messages.stream()
+                .map(Message::getId).collect(Collectors.toList()));
+        return MessageAdapter.buildMsgResp(messages,messageMarks,receiveUid);
 
     }
 }

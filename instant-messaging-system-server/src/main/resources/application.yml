@@ -26,6 +26,11 @@ spring:
   jackson:
     serialization:
       write-dates-as-timestamps: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 wx:
   mp:
     callback: ${imsystem.wx.callback}

@@ -3,11 +3,9 @@ package com.youmin.imsystem.websocket;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
-import com.youmin.imsystem.websocket.domain.enums.WSReqTypeEnum;
-import com.youmin.imsystem.websocket.domain.enums.WSRespTypeEnum;
-import com.youmin.imsystem.websocket.domain.vo.req.WSReqBase;
-import com.youmin.imsystem.websocket.service.impl.WebsocketServiceImpl;
-import io.netty.channel.Channel;
+import com.youmin.imsystem.common.user.enums.WSReqTypeEnum;
+import com.youmin.imsystem.common.user.domain.vo.req.WSReqBase;
+import com.youmin.imsystem.common.user.service.impl.WebsocketServiceImpl;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -15,9 +13,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
-import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 @ChannelHandler.Sharable

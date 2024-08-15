@@ -17,6 +17,11 @@ public class SystemMsgHandler extends AbstractMsgHandler<String>{
     private MessageDao messageDao;
 
     @Override
+    public Object showMsg(Message msg) {
+        return msg.getContent();
+    }
+
+    @Override
     protected void saveMsg(Message message, String body) {
         Message update = new Message();
         update.setId(message.getId());

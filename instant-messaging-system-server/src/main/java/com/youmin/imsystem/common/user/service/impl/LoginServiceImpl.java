@@ -2,8 +2,8 @@ package com.youmin.imsystem.common.user.service.impl;
 
 import com.youmin.imsystem.common.common.constant.RedisConstant;
 import com.youmin.imsystem.common.common.utils.JWTUtils;
-import com.youmin.imsystem.common.common.utils.RedisUtils;
 import com.youmin.imsystem.common.user.service.LoginService;
+import com.youmin.imsystem.common.utils.RedisUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;

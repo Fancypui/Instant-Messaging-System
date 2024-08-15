@@ -56,7 +56,7 @@ public class MybatisGenerator {
         strategyConfig.setEntityTableFieldAnnotationEnable(true);
 
         strategyConfig.setInclude(
-                "test"
+                "message_mark"
         );
 
         List<TableFill> list = new ArrayList<TableFill>();
