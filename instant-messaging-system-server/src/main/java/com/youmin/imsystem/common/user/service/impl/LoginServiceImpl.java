@@ -24,7 +24,13 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public String login(Long uid) {
-        String token = jwtUtils.createToken(uid);
+        String key = RedisConstant.getKey(RedisConstant.USER_TOKEN, uid);
+        String token = RedisUtils.getStr(key);
+        //to adapt to scenario where user login from multiple devices (mobile web, laptop.....)
+        if(Objects.nonNull(token)){
+            return token;
+        }
+        token = jwtUtils.createToken(uid);
         RedisUtils.set(getUserTokenKey(uid),token,TOKEN_VALID_DURATION, TimeUnit.DAYS);
         return token;
     }

@@ -24,4 +24,6 @@ public interface ChatService {
     ChatMessageResp getMsgResp(Message messageRecord, Long receiveUid);
 
     ChatMessageResp getMsgResp(Long msgId, Long receiverUid);
+
+
 }

@@ -15,10 +15,12 @@ public class PushService {
     @Autowired
     private MQProducer mqProducer;
 
+    //push message to specific online users group (provided in uidList)
     public void pushService(WSRespBase<?> wsRespBase, List<Long> uidList){
         mqProducer.sendMsg(MQConstant.PUSH_MSG_EXCHANGE,"", new PushMessageDTO(wsRespBase,uidList));
     }
 
+    //push message to all online users
     public void pushService(WSRespBase<?> wsRespBase){
         mqProducer.sendMsg(MQConstant.PUSH_MSG_EXCHANGE,"", new PushMessageDTO(wsRespBase));
     }

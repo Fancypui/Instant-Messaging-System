@@ -1,14 +1,25 @@
 package com.youmin.imsystem.common;
 
-import javafx.util.Pair;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.youmin.imsystem.common.common.domain.dto.PushMessageDTO;
+import com.youmin.imsystem.common.user.domain.vo.resp.WSFriendApply;
+import com.youmin.imsystem.common.user.domain.vo.resp.WSRespBase;
 
-import javax.validation.Validation;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class test {
 
-    public static void main(String[] args) {
-        System.out.println(Validation.buildDefaultValidatorFactory().getValidator().validate(null));
+    public static void main(String[] args) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        WSFriendApply wsFriendApply = new WSFriendApply(1L, 1);
+        WSRespBase<WSFriendApply> wsFriendApplyWSRespBase = new WSRespBase<>();
+        wsFriendApplyWSRespBase.setType(1);
+        wsFriendApplyWSRespBase.setData(wsFriendApply);
+
+        String s = objectMapper.writeValueAsString(wsFriendApplyWSRespBase);
+        System.out.println(s);
+        WSRespBase<WSFriendApply> wsFriendApply1 = objectMapper.readValue(s, WSRespBase.class);
+        System.out.println(wsFriendApply1.getData());
+
     }
 }

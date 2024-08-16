@@ -1,6 +1,7 @@
 package com.youmin.imsystem.common.chat.controller;
 
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageReq;
+import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageResp;
 import com.youmin.imsystem.common.chat.service.ChatService;
 import com.youmin.imsystem.common.common.domain.vo.resp.ApiResult;
 import com.youmin.imsystem.common.common.utils.RequestHolder;
@@ -24,7 +25,7 @@ public class ChatController {
 
     @ApiOperation("send message endpoint")
     @PostMapping("/msg")
-    public ApiResult<?> sendMsg(@Valid @RequestBody ChatMessageReq request){
+    public ApiResult<ChatMessageResp> sendMsg(@Valid @RequestBody ChatMessageReq request){
         Long msgId = chatService.sendMsg(request, RequestHolder.get().getUid());
         return ApiResult.success(chatService.getMsgResp(msgId, RequestHolder.get().getUid()));
     }
