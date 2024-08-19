@@ -8,8 +8,8 @@ import lombok.Getter;
 @Getter
 public enum RoomTypeEnums {
 
-    FRIEND_ROOM(1,"One-to-One Friend Chat Room"),
-    Group_Room(2,"Group chat");
+    FRIEND_ROOM(2,"One-to-One Friend Chat Room"),
+    Group_Room(1,"Group chat");
 
     private final Integer roomType;
     private final String desc;

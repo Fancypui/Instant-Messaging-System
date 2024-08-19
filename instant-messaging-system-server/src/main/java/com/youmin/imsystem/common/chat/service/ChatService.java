@@ -1,8 +1,11 @@
 package com.youmin.imsystem.common.chat.service;
 
 import com.youmin.imsystem.common.chat.domain.entity.Message;
+import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessagePageRequest;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageReq;
 import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageResp;
+import com.youmin.imsystem.common.common.domain.vo.req.CursorBaseReq;
+import com.youmin.imsystem.common.common.domain.vo.resp.CursorPageBaseResp;
 
 public interface ChatService {
 
@@ -25,5 +28,11 @@ public interface ChatService {
 
     ChatMessageResp getMsgResp(Long msgId, Long receiverUid);
 
-
+    /**
+     * get msg page using cursor
+     * @param request
+     * @param receiverId
+     * @return
+     */
+    CursorPageBaseResp<ChatMessageResp> getMsgPage(ChatMessagePageRequest request, Long receiverId);
 }

@@ -25,7 +25,6 @@ public abstract class AbstractMsgHandler<Req> {
 
     @PostConstruct
     private void init(){
-
         ParameterizedType genericSuperclass = (ParameterizedType)this.getClass().getGenericSuperclass();
         this.reqClass = (Class<Req>) genericSuperclass.getActualTypeArguments()[0];
         MsgHandlerFactory.register(getMsgTypeEnum().getMsgType(), this);

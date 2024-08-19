@@ -3,6 +3,7 @@ package com.youmin.imsystem.common.chat.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.youmin.imsystem.common.chat.dao.*;
 import com.youmin.imsystem.common.chat.domain.entity.*;
+import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessagePageRequest;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageReq;
 import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageResp;
 import com.youmin.imsystem.common.chat.service.ChatService;
@@ -12,6 +13,8 @@ import com.youmin.imsystem.common.chat.service.cache.RoomGroupCache;
 import com.youmin.imsystem.common.chat.service.strategy.msg.AbstractMsgHandler;
 import com.youmin.imsystem.common.chat.service.strategy.msg.MsgHandlerFactory;
 import com.youmin.imsystem.common.common.domain.enums.NormalOrNotEnum;
+import com.youmin.imsystem.common.common.domain.vo.req.CursorBaseReq;
+import com.youmin.imsystem.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.youmin.imsystem.common.common.event.MessageSendEvent;
 import com.youmin.imsystem.common.common.utils.AssertUtils;
 import javafx.print.Collation;
@@ -49,6 +52,11 @@ public class ChatServiceImpl implements ChatService {
 
     @Autowired
     private GroupMemberDao groupMemberDao;
+
+    @Autowired
+    private ContactDao contactDao;
+
+
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -96,6 +104,28 @@ public class ChatServiceImpl implements ChatService {
     public ChatMessageResp getMsgResp(Long msgId, Long receiverUid) {
         Message message = messageDao.getById(msgId);
         return getMsgResp(message,receiverUid);
+    }
+
+    @Override
+    public CursorPageBaseResp<ChatMessageResp> getMsgPage(ChatMessagePageRequest request, Long receiverId) {
+        //lastMsgId is used to avoid user extracting new msg from table after user has been remove
+        Long lastMsgId = getLastMsgId(request.getRoomId(), receiverId);
+        CursorPageBaseResp<Message> msgPage = messageDao.getMsgPage(request, receiverId, lastMsgId);
+        if(CollectionUtil.isEmpty(msgPage.getList())){
+            return CursorPageBaseResp.empty();
+        }
+        return CursorPageBaseResp.init(msgPage,getBatchMsgResp(msgPage.getList(),receiverId));
+    }
+
+    private Long getLastMsgId(Long roomId, Long receiverId){
+        Room room = roomCache.get(roomId);
+        AssertUtils.isNotEmpty(room,"Invalida room id");
+        if(room.isHot()){
+            return null;
+        }
+        //todo test if receiver is not a member of the room, what will be returned by mybatis
+        Contact contact = contactDao.getLastMsgId(roomId,receiverId);
+        return contact.getLastMsgId();
     }
 
     public List<ChatMessageResp> getBatchMsgResp(List<Message> messages, Long receiveUid) {
