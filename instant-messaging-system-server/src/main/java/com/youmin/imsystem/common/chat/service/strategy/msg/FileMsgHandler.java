@@ -21,6 +21,11 @@ public class FileMsgHandler extends AbstractMsgHandler<FileMsgDTO>{
     }
 
     @Override
+    public Object showReplyMsg(Message msg) {
+        return "File"+msg.getExtra().getFileMsgDTO().getFileName();
+    }
+
+    @Override
     protected void saveMsg(Message message, FileMsgDTO body) {
         MessageExtra msgExtra = Optional.ofNullable(message.getExtra()).orElse(new MessageExtra());
         Message update = new Message();

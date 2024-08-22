@@ -22,6 +22,11 @@ public class VideoMsgHandler extends AbstractMsgHandler<VideoMsgDTO>{
     }
 
     @Override
+    public Object showReplyMsg(Message msg) {
+        return "video";
+    }
+
+    @Override
     protected void saveMsg(Message message, VideoMsgDTO body) {
         MessageExtra msgExtra = Optional.ofNullable(message.getExtra()).orElse(new MessageExtra());
         Message update = new Message();

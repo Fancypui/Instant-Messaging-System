@@ -12,6 +12,7 @@
         <module>instant-messaging-system-server</module>
         <module>instant-messaging-system-framework</module>
         <module>instant-messaging-system-framework/instant-messaging-system-transaction</module>
+        <module>instant-messaging-system-framework/instant-messaging-oss-starter</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

@@ -19,6 +19,11 @@ public class ImgMsgHandler extends AbstractMsgHandler<ImgMsgDTO> {
     }
 
     @Override
+    public Object showReplyMsg(Message msg) {
+        return "Image";
+    }
+
+    @Override
     protected void saveMsg(Message message, ImgMsgDTO body) {
         MessageExtra msgExtra = Optional.ofNullable(message.getExtra()).orElse(new MessageExtra());
         Message update = new Message();

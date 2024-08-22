@@ -21,6 +21,11 @@ public class EmojiMsgHandler extends AbstractMsgHandler<EmojiMsgDTO> {
     }
 
     @Override
+    public Object showReplyMsg(Message msg) {
+        return "Emoji";
+    }
+
+    @Override
     protected void saveMsg(Message message, EmojiMsgDTO body) {
         MessageExtra msgExtra = Optional.ofNullable(message.getExtra()).orElse(new MessageExtra());
         Message update = new Message();

@@ -2,6 +2,7 @@ package com.youmin.imsystem.common.chat.service;
 
 import com.youmin.imsystem.common.chat.domain.entity.Message;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessagePageRequest;
+import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageRecallReq;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageReq;
 import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageResp;
 import com.youmin.imsystem.common.common.domain.vo.req.CursorBaseReq;
@@ -35,4 +36,11 @@ public interface ChatService {
      * @return
      */
     CursorPageBaseResp<ChatMessageResp> getMsgPage(ChatMessagePageRequest request, Long receiverId);
+
+    /**
+     * recall msg
+     * @param request
+     * @param uid
+     */
+    void recallMsg(ChatMessageRecallReq request, Long uid);
 }

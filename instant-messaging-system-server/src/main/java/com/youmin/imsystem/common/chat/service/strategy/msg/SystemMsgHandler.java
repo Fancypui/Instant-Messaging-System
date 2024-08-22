@@ -22,6 +22,11 @@ public class SystemMsgHandler extends AbstractMsgHandler<String>{
     }
 
     @Override
+    public Object showReplyMsg(Message msg) {
+        return msg.getContent();
+    }
+
+    @Override
     protected void saveMsg(Message message, String body) {
         Message update = new Message();
         update.setId(message.getId());

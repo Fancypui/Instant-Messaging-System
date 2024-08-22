@@ -15,6 +15,8 @@ import com.youmin.imsystem.common.chat.service.cache.MsgCache;
 import com.youmin.imsystem.common.chat.service.cache.RoomGroupCache;
 import com.youmin.imsystem.common.common.domain.enums.YesOrNoEnum;
 import com.youmin.imsystem.common.common.utils.AssertUtils;
+import com.youmin.imsystem.common.common.utils.discover.PriortizedUrlDiscover;
+import com.youmin.imsystem.common.common.utils.discover.domain.UrlInfo;
 import com.youmin.imsystem.common.user.cache.UserCache;
 import com.youmin.imsystem.common.user.cache.UserInfoCache;
 import com.youmin.imsystem.common.user.domain.entity.User;
@@ -47,6 +49,8 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgReq>{
     @Autowired
     private MsgCache msgCache;
 
+    private static PriortizedUrlDiscover priortizedUrlDiscover = new PriortizedUrlDiscover();
+
     @Override
     public Object showMsg(Message msg) {
         TextMsgResp resp = new TextMsgResp();
@@ -62,7 +66,7 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgReq>{
             replyVO.setId(replyMessage.getId());
             replyVO.setUid(replyMessage.getFromUid());
             replyVO.setType(replyMessage.getType());
-            replyVO.setBody(MsgHandlerFactory.getStrategyOrNull(replyMessage.getType()).showMsg(replyMessage));
+            replyVO.setBody(MsgHandlerFactory.getStrategyOrNull(replyMessage.getType()).showReplyMsg(replyMessage));
             User user = userInfoCache.get(replyMessage.getFromUid());
             replyVO.setUsername(user.getName());
             replyVO.setCanCallBack(YesOrNoEnum.toStatus(Objects.nonNull(msg.getGapCount())&& msg.getGapCount()<= MessageAdapter.CAN_CALLBACK_GAP_COUNT));
@@ -70,6 +74,11 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgReq>{
             resp.setReply(replyVO);
         }
         return resp;
+    }
+
+    @Override
+    public Object showReplyMsg(Message msg) {
+        return msg.getContent();
     }
 
     @Override
@@ -110,7 +119,8 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgReq>{
             update.setReplyMsgId(body.getReplyMsgId());
             update.setGapCount(gapCount);
         }
-        //todo text to url
+        Map<String, UrlInfo> urlContentMap = priortizedUrlDiscover.getContentMap(message.getContent());
+        msgExtra.setUrlContentMap(urlContentMap);
         //tag feature
         if(CollectionUtil.isNotEmpty(body.getAtUidList())){
             msgExtra.setAtUidList(body.getAtUidList());

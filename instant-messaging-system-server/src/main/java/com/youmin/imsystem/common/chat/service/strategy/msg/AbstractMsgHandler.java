@@ -54,6 +54,8 @@ public abstract class AbstractMsgHandler<Req> {
     }
     public abstract Object showMsg(Message msg);
 
+    public abstract Object showReplyMsg(Message msg);
+
     protected void checkMsg(Req body,Long roomId,Long uid){
 
     }

@@ -22,6 +22,11 @@ public class SoundMsgHandler extends AbstractMsgHandler<SoundMsgDTO> {
     }
 
     @Override
+    public Object showReplyMsg(Message msg) {
+        return "voice";
+    }
+
+    @Override
     protected void saveMsg(Message message, SoundMsgDTO body) {
         MessageExtra msgExtra = Optional.ofNullable(message.getExtra()).orElse(new MessageExtra());
         Message update = new Message();

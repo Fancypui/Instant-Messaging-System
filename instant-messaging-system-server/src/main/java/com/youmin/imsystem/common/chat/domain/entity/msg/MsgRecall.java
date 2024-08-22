@@ -14,8 +14,8 @@ import java.util.Date;
 @NoArgsConstructor
 public class MsgRecall implements Serializable {
     private static final long serialVersionUID = 1L;
+    //person who recall
     private Long recallUid;
-
-
+    //recall time
     private Date recallTime;
 }

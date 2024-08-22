@@ -1,6 +1,7 @@
 package com.youmin.imsystem.common.chat.controller;
 
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessagePageRequest;
+import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageRecallReq;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageReq;
 import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageResp;
 import com.youmin.imsystem.common.chat.service.ChatService;
@@ -51,5 +52,11 @@ public class ChatController {
         list.removeIf(msgResp -> uidBlackList.contains(msgResp.getFromUser().getUid().toString()));
     }
 
+    @ApiOperation("recall message")
+    @PutMapping("/msg/recall")
+    public ApiResult<Void> recallMsg(@Valid @RequestBody ChatMessageRecallReq request){
+        chatService.recallMsg(request, RequestHolder.get().getUid());
+        return ApiResult.success();
+    }
 
 }

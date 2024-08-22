@@ -1,8 +1,11 @@
 package com.youmin.imsystem.common.user.service.adapter;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.youmin.imsystem.common.chat.domain.dto.MsgRecallDTO;
 import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageResp;
 import com.youmin.imsystem.common.common.domain.enums.YesOrNoEnum;
 import com.youmin.imsystem.common.user.domain.entity.User;
+import com.youmin.imsystem.common.user.domain.vo.resp.WSMsgRecall;
 import com.youmin.imsystem.common.user.enums.WSRespTypeEnum;
 import com.youmin.imsystem.common.user.domain.vo.resp.WSLoginResp;
 import com.youmin.imsystem.common.user.domain.vo.resp.WSLoginSuccessResp;
@@ -48,5 +51,14 @@ public class WSAdapter {
         wsBaseResp.setData(msgResp);
         wsBaseResp.setType(WSRespTypeEnum.MESSAGE.getType());
         return wsBaseResp;
+    }
+
+    public static WSRespBase<WSMsgRecall> buildMsgRecall(MsgRecallDTO msgRecallDTO) {
+        WSRespBase<WSMsgRecall> resp = new WSRespBase<>();
+        WSMsgRecall wsMsgRecall = new WSMsgRecall();
+        BeanUtil.copyProperties(msgRecallDTO,wsMsgRecall);
+        resp.setData(wsMsgRecall);
+        resp.setType(WSRespTypeEnum.RECALL.getType());
+        return resp;
     }
 }

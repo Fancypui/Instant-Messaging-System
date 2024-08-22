@@ -2,6 +2,7 @@ package com.youmin.imsystem.common.chat.domain.entity.msg;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.youmin.imsystem.common.common.utils.discover.domain.UrlInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
@@ -19,7 +21,7 @@ import java.util.List;
 public class MessageExtra implements Serializable {
     private static final long serialVersionUID = 1L;
 
-//    private Map<String, UrlInfo> urlContentMap;
+    private Map<String, UrlInfo> urlContentMap;
     private MsgRecall msgRecall;
     private List<Long> atUidList;
     private FileMsgDTO fileMsgDTO;

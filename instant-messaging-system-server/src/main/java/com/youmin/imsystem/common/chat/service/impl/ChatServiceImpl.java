@@ -1,9 +1,13 @@
 package com.youmin.imsystem.common.chat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import com.youmin.imsystem.common.chat.dao.*;
 import com.youmin.imsystem.common.chat.domain.entity.*;
+import com.youmin.imsystem.common.chat.domain.enums.MessageTypeEnum;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessagePageRequest;
+import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageRecallReq;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageReq;
 import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageResp;
 import com.youmin.imsystem.common.chat.service.ChatService;
@@ -12,11 +16,15 @@ import com.youmin.imsystem.common.chat.service.cache.RoomCache;
 import com.youmin.imsystem.common.chat.service.cache.RoomGroupCache;
 import com.youmin.imsystem.common.chat.service.strategy.msg.AbstractMsgHandler;
 import com.youmin.imsystem.common.chat.service.strategy.msg.MsgHandlerFactory;
+import com.youmin.imsystem.common.chat.service.strategy.msg.RecallMsgHandler;
 import com.youmin.imsystem.common.common.domain.enums.NormalOrNotEnum;
 import com.youmin.imsystem.common.common.domain.vo.req.CursorBaseReq;
 import com.youmin.imsystem.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.youmin.imsystem.common.common.event.MessageSendEvent;
+import com.youmin.imsystem.common.common.exception.BusinessException;
 import com.youmin.imsystem.common.common.utils.AssertUtils;
+import com.youmin.imsystem.common.user.enums.RoleEnum;
+import com.youmin.imsystem.common.user.service.IRoleService;
 import javafx.print.Collation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +32,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,6 +60,12 @@ public class ChatServiceImpl implements ChatService {
 
     @Autowired
     private ContactDao contactDao;
+
+    @Autowired
+    private IRoleService roleService;
+
+    @Autowired
+    private RecallMsgHandler recallMsgHandler;
 
 
 
@@ -115,6 +126,31 @@ public class ChatServiceImpl implements ChatService {
             return CursorPageBaseResp.empty();
         }
         return CursorPageBaseResp.init(msgPage,getBatchMsgResp(msgPage.getList(),receiverId));
+    }
+
+    @Override
+    public void recallMsg(ChatMessageRecallReq request, Long uid) {
+        Message message = messageDao.getById(request.getMsgId());
+        //validate if message can be recall
+        checkRecall(message,uid);
+        //execute message recall
+        recallMsgHandler.recall(uid,message);
+    }
+
+
+    private void checkRecall(Message message, Long uid){
+        AssertUtils.isNotEmpty(message,"Message is not found in database");
+        AssertUtils.notEqual(message.getType(), MessageTypeEnum.RECALL.getMsgType(),"Message has been recalled");
+        //chat manager has the power to recall all message
+        boolean hasPower = roleService.hasPower(uid, RoleEnum.CHAT_MANAGER);
+        if(hasPower){
+            return;
+        }
+        AssertUtils.equal(message.getFromUid(),uid, "Message cannot be recalled as it is not sent by you");
+        //after 2 minutes cannot be recall
+        if(DateUtil.between(message.getCreateTime(),new Date(), DateUnit.MINUTE)>2){
+            throw new BusinessException("Message cannot be recalled anymore as its sending time has exceeded 2 minutes");
+        }
     }
 
     private Long getLastMsgId(Long roomId, Long receiverId){

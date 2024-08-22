@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public enum RoleEnum {
     ADMIN(1L,"ADMIN"),
-    CHAT_MANAGER(2L,"MODIFY NAME CARD");
+    CHAT_MANAGER(2L,"Group chat manager");
 
 
     private final Long type;
