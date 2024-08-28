@@ -1,16 +1,16 @@
 package com.youmin.imsystem.common.user.service.adapter;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.youmin.imsystem.common.chat.domain.dto.ChatMessageMarkDTO;
 import com.youmin.imsystem.common.chat.domain.dto.MsgRecallDTO;
 import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageResp;
 import com.youmin.imsystem.common.common.domain.enums.YesOrNoEnum;
 import com.youmin.imsystem.common.user.domain.entity.User;
-import com.youmin.imsystem.common.user.domain.vo.resp.WSMsgRecall;
+import com.youmin.imsystem.common.user.domain.vo.resp.*;
 import com.youmin.imsystem.common.user.enums.WSRespTypeEnum;
-import com.youmin.imsystem.common.user.domain.vo.resp.WSLoginResp;
-import com.youmin.imsystem.common.user.domain.vo.resp.WSLoginSuccessResp;
-import com.youmin.imsystem.common.user.domain.vo.resp.WSRespBase;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
+
+import java.util.Collections;
 
 public class WSAdapter {
 
@@ -60,5 +60,17 @@ public class WSAdapter {
         resp.setData(wsMsgRecall);
         resp.setType(WSRespTypeEnum.RECALL.getType());
         return resp;
+    }
+
+    public static WSRespBase<WSMsgMark> buildMsgMarkSend(ChatMessageMarkDTO dto, Integer markCount) {
+        WSMsgMark.WSMsgMarkItem item = new WSMsgMark.WSMsgMarkItem();
+        BeanUtil.copyProperties(dto,item);
+        item.setMarkCount(markCount);
+        WSRespBase<WSMsgMark> wsRespBase = new WSRespBase<>();
+        wsRespBase.setType(WSRespTypeEnum.MARK.getType());
+        WSMsgMark wsMsgMark = new WSMsgMark();
+        wsMsgMark.setMarkList(Collections.singletonList(item));
+        wsRespBase.setData(wsMsgMark);
+        return wsRespBase;
     }
 }

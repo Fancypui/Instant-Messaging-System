@@ -5,18 +5,23 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.youmin.imsystem.common.chat.dao.*;
 import com.youmin.imsystem.common.chat.domain.entity.*;
+import com.youmin.imsystem.common.chat.domain.enums.MessageMarkActTypeEnum;
 import com.youmin.imsystem.common.chat.domain.enums.MessageTypeEnum;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessagePageRequest;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageRecallReq;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageReq;
+import com.youmin.imsystem.common.chat.domain.vo.request.MessageMarkReq;
 import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageResp;
 import com.youmin.imsystem.common.chat.service.ChatService;
 import com.youmin.imsystem.common.chat.service.adapter.MessageAdapter;
 import com.youmin.imsystem.common.chat.service.cache.RoomCache;
 import com.youmin.imsystem.common.chat.service.cache.RoomGroupCache;
+import com.youmin.imsystem.common.chat.service.strategy.mark.AbstractMessageMark;
+import com.youmin.imsystem.common.chat.service.strategy.mark.MessageMarkStrategyFactory;
 import com.youmin.imsystem.common.chat.service.strategy.msg.AbstractMsgHandler;
 import com.youmin.imsystem.common.chat.service.strategy.msg.MsgHandlerFactory;
 import com.youmin.imsystem.common.chat.service.strategy.msg.RecallMsgHandler;
+import com.youmin.imsystem.common.common.annotation.RedissonLock;
 import com.youmin.imsystem.common.common.domain.enums.NormalOrNotEnum;
 import com.youmin.imsystem.common.common.domain.vo.req.CursorBaseReq;
 import com.youmin.imsystem.common.common.domain.vo.resp.CursorPageBaseResp;
@@ -135,6 +140,20 @@ public class ChatServiceImpl implements ChatService {
         checkRecall(message,uid);
         //execute message recall
         recallMsgHandler.recall(uid,message);
+    }
+
+    @Override
+    @RedissonLock(key = "#uid")
+    public void setMessageMark(MessageMarkReq request, Long uid) {
+        AbstractMessageMark strategy = MessageMarkStrategyFactory.getStrategyOrNull(request.getMarkType());
+        switch (MessageMarkActTypeEnum.of(request.getActType())){
+            case MARK:
+                strategy.mark(uid, request.getMsgId());
+                return;
+            case UN_MARK:
+                strategy.unmark(uid, request.getMsgId());
+                return;
+        }
     }
 
 

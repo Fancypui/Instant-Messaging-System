@@ -18,9 +18,17 @@
         </dependency>
         <dependency>
             <groupId>com.youmin</groupId>
-            <artifactId>instant-messaging-system-transaction</artifactId>
+            <artifactId>instant-messaging-system-transaction-starter</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>com.youmin</groupId>
+            <artifactId>instant-messaging-system-oss-starter</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+
+
 
         <dependency>
             <groupId>com.github.binarywang</groupId>
@@ -59,6 +67,7 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
         </dependency>
+
 <!--        <dependency>-->
 <!--            <groupId>org.redisson</groupId>-->
 <!--            <artifactId>redisson</artifactId>-->

@@ -3,6 +3,7 @@ package com.youmin.imsystem.common.chat.controller;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessagePageRequest;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageRecallReq;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageReq;
+import com.youmin.imsystem.common.chat.domain.vo.request.MessageMarkReq;
 import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageResp;
 import com.youmin.imsystem.common.chat.service.ChatService;
 import com.youmin.imsystem.common.common.domain.vo.resp.ApiResult;
@@ -56,6 +57,13 @@ public class ChatController {
     @PutMapping("/msg/recall")
     public ApiResult<Void> recallMsg(@Valid @RequestBody ChatMessageRecallReq request){
         chatService.recallMsg(request, RequestHolder.get().getUid());
+        return ApiResult.success();
+    }
+
+    @ApiOperation("message mark")
+    @PutMapping("/msg/mark")
+    public ApiResult<Void> setMessageMark(@Valid @RequestBody MessageMarkReq request){
+        chatService.setMessageMark(request, RequestHolder.get().getUid());
         return ApiResult.success();
     }
 

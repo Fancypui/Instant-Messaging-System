@@ -5,17 +5,21 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.youmin</groupId>
-        <artifactId>instant-messaging-system</artifactId>
+        <artifactId>instant-messaging-system-framework</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>instant-messaging-oss-starter</artifactId>
+    <artifactId>instant-messaging-system-oss-starter</artifactId>
 
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.youmin</groupId>
+            <artifactId>instant-messaging-system-common-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

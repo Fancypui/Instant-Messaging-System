@@ -4,6 +4,7 @@ import com.youmin.imsystem.common.chat.domain.entity.Message;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessagePageRequest;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageRecallReq;
 import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageReq;
+import com.youmin.imsystem.common.chat.domain.vo.request.MessageMarkReq;
 import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageResp;
 import com.youmin.imsystem.common.common.domain.vo.req.CursorBaseReq;
 import com.youmin.imsystem.common.common.domain.vo.resp.CursorPageBaseResp;
@@ -43,4 +44,6 @@ public interface ChatService {
      * @param uid
      */
     void recallMsg(ChatMessageRecallReq request, Long uid);
+
+    void setMessageMark(MessageMarkReq request, Long uid);
 }

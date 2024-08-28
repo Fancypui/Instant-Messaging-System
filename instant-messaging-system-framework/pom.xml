@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>instant-messaging-system-common</module>
+        <module>instant-messaging-oss-starter</module>
         <module>instant-messaging-system-transaction</module>
     </modules>
 
