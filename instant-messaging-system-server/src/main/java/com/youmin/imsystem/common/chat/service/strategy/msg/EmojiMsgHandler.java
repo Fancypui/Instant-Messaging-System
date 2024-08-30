@@ -40,4 +40,9 @@ public class EmojiMsgHandler extends AbstractMsgHandler<EmojiMsgDTO> {
     MessageTypeEnum getMsgTypeEnum() {
         return MessageTypeEnum.EMOJI;
     }
+
+    @Override
+    public String showContactMsg(Message msg) {
+        return "[Emoji]";
+    }
 }

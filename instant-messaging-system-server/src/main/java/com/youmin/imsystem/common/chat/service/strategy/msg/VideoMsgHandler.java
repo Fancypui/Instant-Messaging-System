@@ -41,4 +41,9 @@ public class VideoMsgHandler extends AbstractMsgHandler<VideoMsgDTO>{
     MessageTypeEnum getMsgTypeEnum() {
         return MessageTypeEnum.VIDEO;
     }
+
+    @Override
+    public String showContactMsg(Message msg) {
+        return "[Video]";
+    }
 }

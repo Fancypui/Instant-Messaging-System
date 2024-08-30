@@ -40,4 +40,9 @@ public class SoundMsgHandler extends AbstractMsgHandler<SoundMsgDTO> {
     MessageTypeEnum getMsgTypeEnum() {
         return MessageTypeEnum.SOUND;
     }
+
+    @Override
+    public String showContactMsg(Message msg) {
+        return "[Voice Message]";
+    }
 }

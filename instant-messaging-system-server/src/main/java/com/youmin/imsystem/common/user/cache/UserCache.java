@@ -73,5 +73,27 @@ public class UserCache {
         return RedisUtils.mget(keys,Long.class);
     }
 
+    public void online(Long uid, Date optTime){
+        String onlineKey = RedisConstant.getKey(RedisConstant.ONLINE_UID_ZSET);
+        String offlineKey = RedisConstant.getKey(RedisConstant.OFFLINE_UID_ZSET);
+        //remove from offline sorted set in redis
+        RedisUtils.zRemove(offlineKey,uid);
+        //update online sorted set in redis
+        RedisUtils.zAdd(onlineKey,uid, optTime.getTime());
+    }
 
+
+    public Long getOnlineNum() {
+        String onlineKey = RedisConstant.getKey(RedisConstant.OFFLINE_UID_ZSET);
+        return RedisUtils.zCard(onlineKey);
+    }
+
+    public void offline(Long uid, Date lastOptTime) {
+        String onlineKey = RedisConstant.getKey(RedisConstant.ONLINE_UID_ZSET);
+        String offlineKey = RedisConstant.getKey(RedisConstant.OFFLINE_UID_ZSET);
+        //remove from offline sorted set in redis
+        RedisUtils.zRemove(onlineKey,uid);
+        //update online sorted set in redis
+        RedisUtils.zAdd(offlineKey,uid, lastOptTime.getTime());
+    }
 }

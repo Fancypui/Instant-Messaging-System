@@ -66,4 +66,9 @@ public class RecallMsgHandler extends AbstractMsgHandler<Object>{
     MessageTypeEnum getMsgTypeEnum() {
         return MessageTypeEnum.RECALL;
     }
+
+    @Override
+    public String showContactMsg(Message msg) {
+        return "Recall an msg";
+    }
 }

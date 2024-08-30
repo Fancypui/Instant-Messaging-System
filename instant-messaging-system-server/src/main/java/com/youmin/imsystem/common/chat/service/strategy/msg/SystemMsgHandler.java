@@ -39,4 +39,9 @@ public class SystemMsgHandler extends AbstractMsgHandler<String>{
     MessageTypeEnum getMsgTypeEnum() {
         return MessageTypeEnum.SYSTEM;
     }
+
+    @Override
+    public String showContactMsg(Message msg) {
+        return msg.getContent();
+    }
 }

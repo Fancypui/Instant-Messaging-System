@@ -40,7 +40,8 @@ public abstract class AbstractRedisStringCache<IN,OUT> implements BatchCache<IN,
             return new HashMap<>();
         }
         //convert keys into redis key format (remove duplicate key)
-        List<String> redisKey = keys.stream().distinct().map(this::getKey).collect(Collectors.toList());
+        keys = keys.stream().distinct().collect(Collectors.toList());
+        List<String> redisKey = keys.stream().map(this::getKey).collect(Collectors.toList());
         //get value from redis using redis key
         List<OUT> valueList = RedisUtils.mget(redisKey, outClass);
 

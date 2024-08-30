@@ -1,10 +1,9 @@
 package com.youmin.imsystem.common.chat.controller;
 
-import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessagePageRequest;
-import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageRecallReq;
-import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageReq;
-import com.youmin.imsystem.common.chat.domain.vo.request.MessageMarkReq;
+import com.youmin.imsystem.common.chat.domain.vo.request.*;
+import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageReadResp;
 import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageResp;
+import com.youmin.imsystem.common.chat.domain.vo.response.MsgReadInfoResp;
 import com.youmin.imsystem.common.chat.service.ChatService;
 import com.youmin.imsystem.common.common.domain.vo.resp.ApiResult;
 import com.youmin.imsystem.common.common.domain.vo.resp.CursorPageBaseResp;
@@ -13,14 +12,12 @@ import com.youmin.imsystem.common.user.cache.UserCache;
 import com.youmin.imsystem.common.user.enums.BlackTypeEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import javafx.print.Collation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController()
 @RequestMapping("/capi/chat")
@@ -65,6 +62,26 @@ public class ChatController {
     public ApiResult<Void> setMessageMark(@Valid @RequestBody MessageMarkReq request){
         chatService.setMessageMark(request, RequestHolder.get().getUid());
         return ApiResult.success();
+    }
+    @ApiOperation("read message")
+    @PutMapping("/msg/read")
+    public ApiResult<Void> msgRead(@Valid @RequestBody ChatMessageReadReq request){
+        chatService.msgRead(request, RequestHolder.get().getUid());
+        return ApiResult.success();
+    }
+
+    @ApiOperation("get msg read and unread count")
+    @GetMapping("/msg/read")
+    public ApiResult<Collection<MsgReadInfoResp>> getReadInfo(@Valid ChatMessageReadInfoReq request){
+        Collection<MsgReadInfoResp> msgReadInfo = chatService.getMsgReadInfo(request, RequestHolder.get().getUid());
+        return ApiResult.success(msgReadInfo);
+    }
+
+    @ApiOperation("get msg read and unread page")
+    @GetMapping("/msg/read/page")
+    public ApiResult<CursorPageBaseResp<ChatMessageReadResp>> getReadPage(@Valid ChatMessageReadPageReq request){
+        CursorPageBaseResp<ChatMessageReadResp> resp = chatService.getReadPage(request, RequestHolder.get().getUid());
+        return ApiResult.success(resp);
     }
 
 }

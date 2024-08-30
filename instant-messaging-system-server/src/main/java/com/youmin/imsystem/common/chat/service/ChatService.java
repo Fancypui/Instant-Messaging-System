@@ -1,13 +1,13 @@
 package com.youmin.imsystem.common.chat.service;
 
 import com.youmin.imsystem.common.chat.domain.entity.Message;
-import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessagePageRequest;
-import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageRecallReq;
-import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageReq;
-import com.youmin.imsystem.common.chat.domain.vo.request.MessageMarkReq;
-import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageResp;
+import com.youmin.imsystem.common.chat.domain.vo.request.*;
+import com.youmin.imsystem.common.chat.domain.vo.response.*;
 import com.youmin.imsystem.common.common.domain.vo.req.CursorBaseReq;
 import com.youmin.imsystem.common.common.domain.vo.resp.CursorPageBaseResp;
+
+import java.util.Collection;
+import java.util.List;
 
 public interface ChatService {
 
@@ -46,4 +46,14 @@ public interface ChatService {
     void recallMsg(ChatMessageRecallReq request, Long uid);
 
     void setMessageMark(MessageMarkReq request, Long uid);
+
+    void msgRead(ChatMessageReadReq request, Long uid);
+
+    Collection<MsgReadInfoResp> getMsgReadInfo(ChatMessageReadInfoReq request, Long uid);
+
+    CursorPageBaseResp<ChatMessageReadResp> getReadPage(ChatMessageReadPageReq request, Long uid);
+
+    CursorPageBaseResp<ChatMemberResp> getMemberPage(MemberReq req, List<Long> memberUidList);
+
+    ChatMemberStatisticResp getMemberStatisticResp();
 }

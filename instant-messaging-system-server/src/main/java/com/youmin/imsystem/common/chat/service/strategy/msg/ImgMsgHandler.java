@@ -37,4 +37,9 @@ public class ImgMsgHandler extends AbstractMsgHandler<ImgMsgDTO> {
     MessageTypeEnum getMsgTypeEnum() {
         return MessageTypeEnum.IMG;
     }
+
+    @Override
+    public String showContactMsg(Message msg) {
+        return "[Image]";
+    }
 }

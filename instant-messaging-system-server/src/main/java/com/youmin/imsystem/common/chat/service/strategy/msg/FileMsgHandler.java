@@ -39,4 +39,9 @@ public class FileMsgHandler extends AbstractMsgHandler<FileMsgDTO>{
     MessageTypeEnum getMsgTypeEnum() {
         return MessageTypeEnum.FILE;
     }
+
+    @Override
+    public String showContactMsg(Message msg) {
+        return "[File]"+msg.getExtra().getFileMsgDTO().getFileName();
+    }
 }

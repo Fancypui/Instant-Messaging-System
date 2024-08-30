@@ -132,4 +132,9 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgReq>{
     MessageTypeEnum getMsgTypeEnum() {
         return MessageTypeEnum.TEXT;
     }
+
+    @Override
+    public String showContactMsg(Message msg) {
+        return msg.getContent();
+    }
 }

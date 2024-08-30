@@ -68,4 +68,6 @@ public abstract class AbstractMsgHandler<Req> {
     protected abstract void saveMsg(Message message,Req body);
 
     abstract MessageTypeEnum getMsgTypeEnum();
+
+    public abstract String showContactMsg(Message msg);
 }

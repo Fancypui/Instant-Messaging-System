@@ -3,19 +3,22 @@ package com.youmin.imsystem.common.chat.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Pair;
 import com.youmin.imsystem.common.chat.dao.*;
 import com.youmin.imsystem.common.chat.domain.entity.*;
 import com.youmin.imsystem.common.chat.domain.enums.MessageMarkActTypeEnum;
 import com.youmin.imsystem.common.chat.domain.enums.MessageTypeEnum;
-import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessagePageRequest;
-import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageRecallReq;
-import com.youmin.imsystem.common.chat.domain.vo.request.ChatMessageReq;
-import com.youmin.imsystem.common.chat.domain.vo.request.MessageMarkReq;
-import com.youmin.imsystem.common.chat.domain.vo.response.ChatMessageResp;
+import com.youmin.imsystem.common.chat.domain.vo.request.*;
+import com.youmin.imsystem.common.chat.domain.vo.response.*;
 import com.youmin.imsystem.common.chat.service.ChatService;
+import com.youmin.imsystem.common.chat.service.ContactService;
+import com.youmin.imsystem.common.chat.service.adapter.ChatAdapter;
+import com.youmin.imsystem.common.chat.service.adapter.MemberAdapter;
 import com.youmin.imsystem.common.chat.service.adapter.MessageAdapter;
+import com.youmin.imsystem.common.chat.service.adapter.RoomAdapter;
 import com.youmin.imsystem.common.chat.service.cache.RoomCache;
 import com.youmin.imsystem.common.chat.service.cache.RoomGroupCache;
+import com.youmin.imsystem.common.chat.service.helper.ChatMemberHelper;
 import com.youmin.imsystem.common.chat.service.strategy.mark.AbstractMessageMark;
 import com.youmin.imsystem.common.chat.service.strategy.mark.MessageMarkStrategyFactory;
 import com.youmin.imsystem.common.chat.service.strategy.msg.AbstractMsgHandler;
@@ -28,10 +31,12 @@ import com.youmin.imsystem.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.youmin.imsystem.common.common.event.MessageSendEvent;
 import com.youmin.imsystem.common.common.exception.BusinessException;
 import com.youmin.imsystem.common.common.utils.AssertUtils;
+import com.youmin.imsystem.common.user.cache.UserCache;
+import com.youmin.imsystem.common.user.dao.UserDao;
+import com.youmin.imsystem.common.user.domain.entity.User;
+import com.youmin.imsystem.common.user.enums.ChatActiveStatusEnum;
 import com.youmin.imsystem.common.user.enums.RoleEnum;
 import com.youmin.imsystem.common.user.service.IRoleService;
-import javafx.print.Collation;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -71,6 +76,15 @@ public class ChatServiceImpl implements ChatService {
 
     @Autowired
     private RecallMsgHandler recallMsgHandler;
+
+    @Autowired
+    private ContactService contactService;
+
+    @Autowired
+    private UserDao userDao;
+
+    @Autowired
+    private UserCache userCache;
 
 
 
@@ -154,6 +168,90 @@ public class ChatServiceImpl implements ChatService {
                 strategy.unmark(uid, request.getMsgId());
                 return;
         }
+    }
+
+    @Override
+    @RedissonLock(key = "#uid")
+    public void  msgRead(ChatMessageReadReq request, Long uid) {
+        Contact contact = contactDao.getByRoomIdAndUId(request.getRoomId(), uid);
+        if(Objects.nonNull(contact)){
+            Contact update = new Contact();
+            update.setId(contact.getId());
+            update.setReadTime(new Date());
+            contactDao.updateById(update);
+        }else {
+            Contact insert = new Contact();
+            insert.setUid(uid);
+            insert.setRoomId(request.getRoomId());
+            insert.setReadTime(new Date());
+            contactDao.save(insert);
+        }
+    }
+
+    @Override
+    public Collection<MsgReadInfoResp> getMsgReadInfo(ChatMessageReadInfoReq request, Long uid) {
+        List<Message> messages = messageDao.listByIds(request.getMsgIds());
+        messages.forEach(message -> {
+                    AssertUtils.equal(uid,message.getFromUid(),"You are not authorised to view");
+        });
+        return contactService.getMsgReadInfo(messages).values();
+
+    }
+
+    @Override
+    public CursorPageBaseResp<ChatMessageReadResp> getReadPage(ChatMessageReadPageReq request, Long uid) {
+        Message message = messageDao.getById(request.getMsgId());
+        AssertUtils.isNotEmpty(message,"Invalid message");
+        AssertUtils.equal(message.getFromUid(),uid,"Cannot view");
+        CursorPageBaseResp<Contact> page;
+        if(request.getSearchType()==1){
+            page = contactDao.getReadPage(request,message);
+        }else{
+            page = contactDao.getUnReadPage(request,message);
+        }
+        return CursorPageBaseResp.init(page, RoomAdapter.buildReadResp(page.getList()));
+    }
+
+    @Override
+    public CursorPageBaseResp<ChatMemberResp> getMemberPage(MemberReq req, List<Long> memberUidList) {
+        Pair<ChatActiveStatusEnum, String> cursorPair = ChatMemberHelper.getCursorPair(req.getCursor());
+        ChatActiveStatusEnum activeStatusEnum = cursorPair.getKey();
+        String timeCursor = cursorPair.getValue();
+        List<ChatMemberResp> result = new ArrayList<>();//final list response
+        Boolean isLast = Boolean.FALSE;
+        if(activeStatusEnum == ChatActiveStatusEnum.ONLINE){//online list
+            CursorPageBaseResp<User> userPage =
+                    userDao.getUserPage(memberUidList, new CursorBaseReq(req.getPageSize(), timeCursor), activeStatusEnum);
+            result.addAll(MemberAdapter.buildChatMemberResp(userPage.getList()));
+            if(userPage.getIsLast()){//load extra record from offline user if online page is last page
+                activeStatusEnum = ChatActiveStatusEnum.OFFLINE;
+                Integer leftSize = req.getPageSize() - userPage.getList().size();
+                userPage = userDao.getUserPage(memberUidList, new CursorBaseReq(leftSize,null),activeStatusEnum);
+                result.addAll(MemberAdapter.buildChatMemberResp(userPage.getList()));
+            }
+            timeCursor = userPage.getCursor();
+            isLast = userPage.getIsLast();
+        }else if(activeStatusEnum == ChatActiveStatusEnum.OFFLINE){
+            CursorPageBaseResp<User> userPage =
+                    userDao.getUserPage(memberUidList, new CursorBaseReq(req.getPageSize(), timeCursor), activeStatusEnum);
+            result.addAll(MemberAdapter.buildChatMemberResp(userPage.getList()));
+            timeCursor = userPage.getCursor();
+            isLast = userPage.getIsLast();
+        }
+        //get group member role id
+        List<Long> uidList = result.stream().map(ChatMemberResp::getUid).collect(Collectors.toList());
+        RoomGroup roomGroup = roomGroupCache.get(req.getRoomId());
+        Map<Long, Integer> memberMapRole = groupMemberDao.getMemberMapRole(uidList, roomGroup.getId());
+        result.forEach(member->member.setRoleId(memberMapRole.get(member.getUid())));
+        return new CursorPageBaseResp<>(ChatMemberHelper.generateCursor(timeCursor,activeStatusEnum),isLast,result);
+    }
+
+    @Override
+    public ChatMemberStatisticResp getMemberStatisticResp() {
+        Long onlineNum = userCache.getOnlineNum();
+        ChatMemberStatisticResp resp = new ChatMemberStatisticResp();
+        resp.setOnlineNum(onlineNum);
+        return resp;
     }
 
 

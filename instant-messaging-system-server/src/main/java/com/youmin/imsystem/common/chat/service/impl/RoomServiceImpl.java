@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -49,6 +50,12 @@ public class RoomServiceImpl implements IRoomService {
         String roomKey = ChatAdapter.generateKey(uidList);
         roomFriendDao.disableRoom(roomKey);
 
+    }
+
+    @Override
+    public RoomFriend getFriendRoom(Long uid, Long friendUid) {
+        String friendRoomKey = ChatAdapter.generateKey(Arrays.asList(uid, friendUid));
+        return roomFriendDao.getRoomByRoomKey(friendRoomKey);
     }
 
     private Room createRoom(RoomTypeEnums roomTypeEnums) {

@@ -4,9 +4,14 @@ import com.youmin.imsystem.common.chat.domain.entity.Room;
 import com.youmin.imsystem.common.chat.domain.entity.RoomFriend;
 import com.youmin.imsystem.common.chat.domain.enums.HotFlagEnum;
 import com.youmin.imsystem.common.chat.domain.enums.RoomTypeEnums;
+import com.youmin.imsystem.common.chat.domain.vo.response.ChatMemberResp;
 import com.youmin.imsystem.common.common.domain.enums.NormalOrNotEnum;
+import com.youmin.imsystem.common.user.domain.entity.User;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ChatAdapter {
@@ -40,4 +45,20 @@ public class ChatAdapter {
         roomFriend.setStatus(NormalOrNotEnum.NORMAL.getStatus());
         return roomFriend;
     }
+
+    public static Set<Long> buildFriendUidSet(Collection<RoomFriend> values, Long uid) {
+            return values.
+                    stream()
+                    .map(a->getFriendUid(a,uid))
+                    .collect(Collectors.toSet());
+    }
+
+    /**
+     * get friend uid
+     */
+    public static Long getFriendUid(RoomFriend roomFriend,Long uid){
+        return Objects.equals(roomFriend.getUid1(),uid)?roomFriend.getUid2():roomFriend.getUid1();
+    }
+
+
 }
