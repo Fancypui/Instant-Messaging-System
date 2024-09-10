@@ -1,14 +1,22 @@
 package com.youmin.imsystem.common.chat.service.impl;
 
+import com.youmin.imsystem.common.chat.dao.GroupMemberDao;
 import com.youmin.imsystem.common.chat.dao.RoomDao;
 import com.youmin.imsystem.common.chat.dao.RoomFriendDao;
+import com.youmin.imsystem.common.chat.dao.RoomGroupDao;
+import com.youmin.imsystem.common.chat.domain.entity.GroupMember;
 import com.youmin.imsystem.common.chat.domain.entity.Room;
 import com.youmin.imsystem.common.chat.domain.entity.RoomFriend;
+import com.youmin.imsystem.common.chat.domain.entity.RoomGroup;
+import com.youmin.imsystem.common.chat.domain.enums.GroupRoleAppEnum;
 import com.youmin.imsystem.common.chat.domain.enums.RoomTypeEnums;
 import com.youmin.imsystem.common.chat.service.IRoomService;
 import com.youmin.imsystem.common.chat.service.adapter.ChatAdapter;
+import com.youmin.imsystem.common.common.annotation.RedissonLock;
 import com.youmin.imsystem.common.common.domain.enums.NormalOrNotEnum;
 import com.youmin.imsystem.common.common.utils.AssertUtils;
+import com.youmin.imsystem.common.user.cache.UserInfoCache;
+import com.youmin.imsystem.common.user.domain.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +33,15 @@ public class RoomServiceImpl implements IRoomService {
 
     @Autowired
     private RoomDao roomDao;
+
+    @Autowired
+    private GroupMemberDao groupMemberDao;
+
+    @Autowired
+    private UserInfoCache userInfoCache;
+
+    @Autowired
+    private RoomGroupDao roomGroupDao;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -56,6 +73,27 @@ public class RoomServiceImpl implements IRoomService {
     public RoomFriend getFriendRoom(Long uid, Long friendUid) {
         String friendRoomKey = ChatAdapter.generateKey(Arrays.asList(uid, friendUid));
         return roomFriendDao.getRoomByRoomKey(friendRoomKey);
+    }
+
+    @Override
+    @Transactional
+    @RedissonLock(key = "#uid")
+    public RoomGroup createGroupRoom(Long uid) {
+        List<GroupMember> selfGroup = groupMemberDao.getSelfGroup(uid);
+        AssertUtils.isEmpty(selfGroup,"Every user can only create one group");
+        Room room = createRoom(RoomTypeEnums.Group_Room);
+        User user = userInfoCache.get(uid);
+        //insert room group
+        RoomGroup roomGroup = ChatAdapter.buildGroupRoom(user, room.getId());
+        roomGroupDao.save(roomGroup);
+        //insert group owner
+        GroupMember leader = GroupMember.builder()
+                .groupId(roomGroup.getId())
+                .role(GroupRoleAppEnum.LEADER.getType())
+                .uid(uid)
+                .build();
+        groupMemberDao.save(leader);
+        return roomGroup;
     }
 
     private Room createRoom(RoomTypeEnums roomTypeEnums) {

@@ -2,6 +2,7 @@ package com.youmin.imsystem.common.chat.service.adapter;
 
 import com.youmin.imsystem.common.chat.domain.entity.Room;
 import com.youmin.imsystem.common.chat.domain.entity.RoomFriend;
+import com.youmin.imsystem.common.chat.domain.entity.RoomGroup;
 import com.youmin.imsystem.common.chat.domain.enums.HotFlagEnum;
 import com.youmin.imsystem.common.chat.domain.enums.RoomTypeEnums;
 import com.youmin.imsystem.common.chat.domain.vo.response.ChatMemberResp;
@@ -61,4 +62,11 @@ public class ChatAdapter {
     }
 
 
+    public static RoomGroup buildGroupRoom(User user, Long roomId) {
+        RoomGroup roomGroup = new RoomGroup();
+        roomGroup.setRoomId(roomId);
+        roomGroup.setAvatar(user.getAvatar());
+        roomGroup.setName(user.getName() + "'s group'");
+        return roomGroup;
+    }
 }

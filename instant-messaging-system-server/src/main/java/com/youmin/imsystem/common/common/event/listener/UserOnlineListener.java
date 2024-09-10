@@ -4,7 +4,7 @@ import com.youmin.imsystem.common.common.event.UserOnlineEvent;
 import com.youmin.imsystem.common.user.cache.UserCache;
 import com.youmin.imsystem.common.user.dao.UserDao;
 import com.youmin.imsystem.common.user.domain.entity.User;
-import com.youmin.imsystem.common.user.enums.UserActiveStatusEnum;
+import com.youmin.imsystem.common.user.enums.ChatActiveStatusEnum;
 import com.youmin.imsystem.common.user.service.IpService;
 import com.youmin.imsystem.common.user.service.adapter.WSAdapter;
 import com.youmin.imsystem.common.user.service.impl.PushService;
@@ -48,7 +48,7 @@ public class UserOnlineListener {
         update.setLastOptTime(user.getLastOptTime());
         update.setIpInfo(user.getIpInfo());
         update.setId(user.getId());
-        update.setActiveStatus(UserActiveStatusEnum.ONLINE.getType());
+        update.setActiveStatus(ChatActiveStatusEnum.ONLINE.getStatus());
         userDao.updateById(update);
         ipService.refreshIpDetail(user.getId());
     }

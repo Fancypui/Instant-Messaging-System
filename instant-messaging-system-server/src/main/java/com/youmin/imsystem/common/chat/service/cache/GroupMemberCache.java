@@ -5,6 +5,7 @@ import com.youmin.imsystem.common.chat.dao.RoomGroupDao;
 import com.youmin.imsystem.common.chat.domain.entity.GroupMember;
 import com.youmin.imsystem.common.chat.domain.entity.RoomGroup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -27,5 +28,9 @@ public class GroupMemberCache {
             return null;
         }
         return groupMemberDao.getMemberUidList(roomGroup.getId());
+    }
+    @CacheEvict(cacheNames = "member", key = "'groupMember'+#roomId")
+    public List<Long> evictMemberUidList(Long roomId) {
+        return null;
     }
 }
